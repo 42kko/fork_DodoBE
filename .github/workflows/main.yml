@@ -4,27 +4,25 @@ name: Sync to fork_dodoFE Repository
 on:
   push:
     branches:
-      - main  # 원본 레포지토리의 브랜치 이름을 설정합니다.
+      - main  # 원본 레포지토리의 브랜치 이름입니다.
 
 jobs:
   sync:
     runs-on: ubuntu-latest
     steps:
+      # 1. 원본 레포지토리의 코드를 가져오기
       - name: Checkout source repository
         uses: actions/checkout@v2
         with:
           token: ${{ secrets.TEST }} # 원본 레포지토리 액세스 토큰
 
-      - name: Clean repository for rsync-style sync
-        run: |
-          rm -rf .git
-          git init
-          git remote add origin https://$TARGET_REPO_TOKEN@github.com/42kko/fork_dodoFE.git
-          git add .
-          git commit -m "Syncing updates from source repository"
-
+      # 2. 타겟 레포지토리에 복사 및 푸시
       - name: Push to target repository
         env:
-          TARGET_REPO_TOKEN: ${{ secrets.TEST }}
+          TARGET_REPO: https://github.com/42kko/fork_dodoFE.git
+          TARGET_REPO_TOKEN: ${{ secrets.TEST }} # 타겟 레포지토리 액세스 토큰
         run: |
-          git push -u origin main -f
+          git remote set-url origin https://$TARGET_REPO_TOKEN@github.com/42kko/fork_dodoFE.git
+          git add .
+          git commit -m "Sync from source repository"
+          git push origin main -f
