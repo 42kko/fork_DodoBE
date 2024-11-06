@@ -22,6 +22,9 @@ jobs:
         KRAM_REPO: 42kko/fork_dodoFE  # 개인 레포지토리 설정
         TOKEN: ${{ secrets.TEST }}  # 개인 액세스 토큰 설정
       run: |
-        git config --global user.name "42kko"
-        git remote set-url origin https://$TOKEN@github.com/$KRAM_REPO.git
-        git push -u origin main
+        # 원본 레포지토리와 개인 레포지토리 각각에 리모트 설정
+        git remote add origin https://$TOKEN@github.com/original_org/original_repo.git
+        git fetch origin main
+        git checkout main
+        git remote add personal https://$TOKEN@github.com/42kko/fork_dodoFE.git
+        git push -u personal main
