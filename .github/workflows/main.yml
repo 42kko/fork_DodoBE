@@ -16,6 +16,11 @@ jobs:
         with:
           token: ${{ secrets.TEST }} # 원본 레포지토리 액세스 토큰
 
+      - name: Set up Git user
+        run: |
+          git config --global user.name "42kko"
+          git config --global user.email "42kko@student.42seoul.kr"
+
       # 2. 타겟 레포지토리에 복사 및 푸시
       - name: Push to target repository
         env:
