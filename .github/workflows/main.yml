@@ -21,6 +21,12 @@ jobs:
           git config --global user.name "42kko"
           git config --global user.email "42kko@student.42seoul.kr"
 
+      # 3. 원본 레포지토리에서 최신 커밋 강제 pull
+      - name: Force-pull latest changes from source
+        run: |
+          git fetch --all
+          git reset --hard origin/main  # 원본 레포지토리의 main 브랜치와 동기화
+          
       # 2. 타겟 레포지토리에 복사 및 푸시
       - name: Push to target repository
         env:
