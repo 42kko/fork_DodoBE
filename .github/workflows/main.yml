@@ -1,5 +1,5 @@
-# .github/workflows/sync-to-target.yml
-name: Sync to Target Repository
+# .github/workflows/sync-to-fork.yml
+name: Sync to fork_dodoFE Repository
 
 on:
   push:
@@ -18,7 +18,7 @@ jobs:
       - name: Set up Git
         run: |
           git config --global user.name '42kko'
-          git config --global user.email 'your-email@example.com'
+          git config --global user.email 'rhrudgns159@naver.com'
 
       - name: Push to target repository
         env:
