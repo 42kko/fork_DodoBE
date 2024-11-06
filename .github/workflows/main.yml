@@ -18,7 +18,11 @@ jobs:
       - name: Set up Git user
         run: |
           git config --global user.name "42kko"
-          git config --global user.email "you@example.com"
+
+      # .github/workflows 디렉토리 삭제
+      - name: Remove workflows directory
+        run: |
+          rm -rf .github/workflows
 
       # 타겟 레포지토리 설정 및 강제 푸시
       - name: Force push to target repository
