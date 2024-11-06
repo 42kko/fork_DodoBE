@@ -23,6 +23,7 @@ jobs:
         env:
           TARGET_REPO: https://github.com/42kko/fork_dodoFE.git # HTTPS URL로 변경
           TARGET_REPO_TOKEN: ${{ secrets.TEST }} # 타겟 레포지토리 액세스 토큰
+          GIT_HTTP_MAX_REQUEST_BUFFER: 157286400  # 150MB로 설정
         run: |
           git remote add target https://$TARGET_REPO_TOKEN@github.com/42kko/fork_dodoFE.git
           git push target main:main -f
