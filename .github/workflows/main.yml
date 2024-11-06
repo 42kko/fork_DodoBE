@@ -18,11 +18,16 @@ jobs:
       - name: Set up Git
         run: |
           git config --global user.name '42kko'
+          git config --global user.email 'rhrudgns159@naver.com'
+          git config --global http.postBuffer 1048576000  # 1GB로 설정
+          git config --global pack.windowMemory "100m"  # 패킹 메모리 설정
+          git config --global pack.packSizeLimit "100m"  # 패킹 크기 제한
+          git config --global pack.threads "1"  # 스레드 수 제한
 
       - name: Push to target repository
         env:
-          TARGET_REPO: https://github.com/42kko/fork_dodoFE.git # HTTPS URL로 변경
-          TARGET_REPO_TOKEN: ${{ secrets.TEST }} # 타겟 레포지토리 액세스 토큰
+          TARGET_REPO: https://github.com/42kko/fork_dodoFE.git
+          TARGET_REPO_TOKEN: ${{ secrets.TEST }}
           GIT_HTTP_MAX_REQUEST_BUFFER: 157286400  # 150MB로 설정
         run: |
           git remote add target https://$TARGET_REPO_TOKEN@github.com/42kko/fork_dodoFE.git
