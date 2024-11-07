@@ -29,4 +29,8 @@ public class Member {
         this.nickname = nickname;
         this.originName = originName;
     }
+
+    public Member(final String email) {
+        this.email = email;
+    }
 }
