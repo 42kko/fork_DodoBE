@@ -34,6 +34,8 @@ jobs:
         echo "Commit SHA: $GITHUB_SHA"
         echo "Actor: $GITHUB_ACTOR"
         echo "Ref: $GITHUB_REF"
+        echo "====="
+        env
 
     - name: Send Corrected Notification
       uses: sarisia/actions-status-discord@v1.15.0
