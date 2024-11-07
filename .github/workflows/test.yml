@@ -34,6 +34,8 @@ jobs:
         echo "Commit SHA: $GITHUB_SHA"
         echo "Actor: $GITHUB_ACTOR"
         echo "Ref: $GITHUB_REF"
+        export GITHUB_TRIGGERING_ACTOR="notme"
+        export GITHUB_ACTOR="notme23"
         echo "====="
         env
 
