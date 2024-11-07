@@ -11,7 +11,7 @@ jobs:
     steps:
     - name: Fetch Last Push Info from Original Repo
       env:
-        GITHUB_TOKEN: ${{ secrets.KRAMPOLINE_TESTREPOKEY }} # 원본 레포 정보에 접근하기 위한 Token
+        GITHUB_TOKEN: ${{ secrets.TEST }} # 원본 레포 정보에 접근하기 위한 Token
         ORIGINAL_REPO: "DoDoDocs/dododocs-backend" # 원본 레포 이름
         ORIGINAL_BRANCH: "main" # 원본 레포의 브랜치 이름
       run: |
