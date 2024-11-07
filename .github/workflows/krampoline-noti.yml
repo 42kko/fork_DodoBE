@@ -11,7 +11,7 @@ jobs:
     steps:
     - name: Fetch Last Push Info from Original Repo
       env:
-        GITHUB_TOKEN: ${{ secrets.KRAMPOLINE_TESTREPOKEY }}
+        GITHUB_TOKEN: ${{ secrets.TEST }}
         DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_FULLSTACK }}
       run: |
         # 환경변수 설정
