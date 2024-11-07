@@ -31,8 +31,15 @@ public class ApiTestController {
     }
 
     @PostMapping("/dbinsert")
-    public ResponseEntity<Member> insertMember(final CreateMemberRequest createMemberRequest) {
-        memberRepository.save(new Member(createMemberRequest.getEmail()));
+    public ResponseEntity<Void> insertMember() {
+        Member member = memberRepository.save(new Member("email"));
+        System.out.println(member.getId());
+        System.out.println(member.getEmail());
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/dbfind")
+    public ResponseEntity<Member> findMember() {
+        return ResponseEntity.ok(memberRepository.findById(1L).orElse(null));
     }
 }

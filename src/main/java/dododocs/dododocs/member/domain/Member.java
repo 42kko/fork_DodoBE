@@ -31,6 +31,8 @@ public class Member {
     }
 
     public Member(final String email) {
-        this.email = email;
+        this.email = "devhaon@kakao.com";
+        this.nickname = "devhaon";
+        this.originName = "lee min sung";
     }
 }
