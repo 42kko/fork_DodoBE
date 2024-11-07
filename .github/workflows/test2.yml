@@ -12,24 +12,19 @@ jobs:
     - name: Fetch Last Push Info from Original Repo
       env:
         GITHUB_TOKEN: ${{ secrets.TEST }} # GitHub Token 설정
+        DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_FULLSTACK }}
       run: |
         # 환경변수 설정
         ORIGINAL_REPO="DoDoDocs/dododocs-backend"
         ORIGINAL_BRANCH="main"
+        ORIGINAL_REPO_URL="https://github.com/$ORIGINAL_REPO"
 
-        # API URL 생성
+        # API 호출
         API_URL="https://api.github.com/repos/$ORIGINAL_REPO/branches/$ORIGINAL_BRANCH"
         echo "API URL: $API_URL"
 
-        # API 호출
         API_RESPONSE=$(curl -s -H "Authorization: token $GITHUB_TOKEN" "$API_URL")
         echo "API Response: $API_RESPONSE"
-
-        # 오류 처리
-        if [ -z "$API_RESPONSE" ] || [[ "$API_RESPONSE" == *"Not Found"* ]]; then
-          echo "API call failed. Please check the URL, branch, or token."
-          exit 1
-        fi
 
         # JSON 파싱
         LAST_COMMIT_SHA=$(echo "$API_RESPONSE" | jq -r '.commit.sha')
@@ -37,59 +32,45 @@ jobs:
         LAST_COMMIT_AUTHOR=$(echo "$API_RESPONSE" | jq -r '.commit.commit.author.name')
 
         # 디버깅 출력
+        echo "Repository: $ORIGINAL_REPO"
+        echo "Branch: $ORIGINAL_BRANCH"
         echo "Last Commit SHA: $LAST_COMMIT_SHA"
         echo "Last Commit Message: $LAST_COMMIT_MESSAGE"
         echo "Last Commit Author: $LAST_COMMIT_AUTHOR"
 
-        # 오류 처리
-        if [ "$LAST_COMMIT_SHA" = "null" ] || [ -z "$LAST_COMMIT_SHA" ]; then
-          echo "Failed to fetch commit details. Exiting."
-          exit 1
-        fi
-
-    - name: Send Discord Webhook
-      env:
-        DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_FULLSTACK }}
-        GITHUB_TOKEN: ${{ secrets.TEST }}
-      run: |
-        # Repository URL 구성
-        ORIGINAL_REPO="DoDoDocs/dododocs-backend"
-        ORIGINAL_BRANCH="main"
-        ORIGINAL_REPO_URL="https://github.com/$ORIGINAL_REPO"
-
-        # Webhook 데이터 전송
+        # Webhook 데이터 구성
         curl -H "Content-Type: application/json" \
           -X POST \
-          -d '{
-            "embeds": [
+          -d "{
+            \"embeds\": [
               {
-                "color": 16739652,
-                "timestamp": "'"$(date -u +"%Y-%m-%dT%H:%M:%SZ")"'",
-                "title": "❗️ Remind : 크램폴린 CI/CD ❗️",
-                "description": "크램폴린에서 D2Hub 빌드와 Kargo 배포를 진행해주세요.\n[여기](https://krampoline-ide.kakao.com/organization/org_ffYH4PrzrR6et39c2k/dashboard)를 눌러 크램폴린IDE로 들어가세요!",
-                "fields": [
+                \"color\": 16739652,
+                \"timestamp\": \"$(date -u +"%Y-%m-%dT%H:%M:%SZ")\",
+                \"title\": \"❗️ Remind : 크램폴린 CI/CD ❗️\",
+                \"description\": \"크램폴린에서 D2Hub 빌드와 Kargo 배포를 진행해주세요.\\n[여기](https://krampoline-ide.kakao.com/organization/org_ffYH4PrzrR6et39c2k/dashboard)를 눌러 크램폴린IDE로 들어가세요!\",
+                \"fields\": [
                   {
-                    "name": "Repository",
-                    "value": "[${ORIGINAL_REPO}](${ORIGINAL_REPO_URL})",
-                    "inline": true
+                    \"name\": \"Repository\",
+                    \"value\": \"[$ORIGINAL_REPO]($ORIGINAL_REPO_URL)\",
+                    \"inline\": true
                   },
                   {
-                    "name": "Ref",
-                    "value": "refs/heads/${ORIGINAL_BRANCH}",
-                    "inline": true
+                    \"name\": \"Ref\",
+                    \"value\": \"refs/heads/$ORIGINAL_BRANCH\",
+                    \"inline\": true
                   },
                   {
-                    "name": "Last Commit",
-                    "value": "[`${LAST_COMMIT_SHA:0:7}`](${ORIGINAL_REPO_URL}/commit/${LAST_COMMIT_SHA})\n${LAST_COMMIT_MESSAGE}",
-                    "inline": false
+                    \"name\": \"Last Commit\",
+                    \"value\": \"[\`${LAST_COMMIT_SHA:0:7}\`]($ORIGINAL_REPO_URL/commit/$LAST_COMMIT_SHA)\\n$LAST_COMMIT_MESSAGE\",
+                    \"inline\": false
                   },
                   {
-                    "name": "Triggered by",
-                    "value": "${LAST_COMMIT_AUTHOR}",
-                    "inline": true
+                    \"name\": \"Triggered by\",
+                    \"value\": \"$LAST_COMMIT_AUTHOR\",
+                    \"inline\": true
                   }
                 ]
               }
             ]
-          }' \
+          }" \
           "$DISCORD_WEBHOOK_URL"
