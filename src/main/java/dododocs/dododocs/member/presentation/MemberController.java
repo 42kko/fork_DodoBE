@@ -1,6 +1,9 @@
 package dododocs.dododocs.member.presentation;
 
+import dododocs.dododocs.auth.dto.Accessor;
+import dododocs.dododocs.auth.presentation.authentication.Authentication;
 import dododocs.dododocs.member.application.MemberService;
+import dododocs.dododocs.member.dto.FindRepoNameListResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,11 +21,8 @@ public class MemberController {
     }
 
     @GetMapping("/repos")
-    public ResponseEntity<Void> findMemberRepoList() {
-        List<String> names = memberService.getUserRepositories("msung99");
-        for(String name : names) {
-            System.out.println(name);
-        }
-        return ResponseEntity.ok().build();
+    public ResponseEntity<FindRepoNameListResponse> findMemberRepoList(@Authentication final Accessor accessor) {
+        FindRepoNameListResponse findRepoNameListResponse = memberService.getUserRepositories(accessor.getId());
+        return ResponseEntity.ok(findRepoNameListResponse);
     }
 }

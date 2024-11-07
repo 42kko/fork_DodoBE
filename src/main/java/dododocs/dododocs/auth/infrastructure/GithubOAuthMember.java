@@ -9,10 +9,14 @@ public class GithubOAuthMember {
     private String email;
 
     @JsonProperty("name")
-    private String name;
+    private String nickName;
 
-    public GithubOAuthMember(final String email, final String name) {
+    @JsonProperty("login")
+    private String originName;
+
+    public GithubOAuthMember(final String email, final String nickName, final  String originName) {
         this.email = email;
-        this.name = name;
+        this.nickName = nickName;
+        this.originName = originName;
     }
 }

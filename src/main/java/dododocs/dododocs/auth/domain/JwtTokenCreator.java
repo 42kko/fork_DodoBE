@@ -12,7 +12,6 @@ public class JwtTokenCreator {
 
     public String createToken(final long memberId) {
         final String accessToken = jwtTokenProvider.createAccessToken(memberId);
-        System.out.println(accessToken);
         return accessToken;
     }
 
