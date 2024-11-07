@@ -11,7 +11,7 @@ jobs:
     steps:
     - name: Fetch Last Push Info from Original Repo
       env:
-        GITHUB_TOKEN: ${{ secrets.MY_PERSONAL_ACCESS_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.TEST }}
       run: |
         # GitHub API로 원본 레포 정보 가져오기
         ORIGINAL_REPO="DoDoDocs/dododocs-backend"
