@@ -11,7 +11,7 @@ jobs:
     steps:
     - name: Fetch Last Push Info from Original Repo
       env:
-        GITHUB_TOKEN: ${{ secrets.TEST }}
+        GITHUB_TOKEN: ${{ secrets.KRAMPOLINE_TESTREPOKEY }}
         DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_FULLSTACK }}
       run: |
         # 환경변수 설정
@@ -31,14 +31,6 @@ jobs:
         LAST_COMMIT_SHA=$(echo "$API_RESPONSE" | jq -r '.commit.sha')
         LAST_COMMIT_MESSAGE=$(echo "$API_RESPONSE" | jq -r '.commit.commit.message')
         LAST_COMMIT_AUTHOR=$(echo "$API_RESPONSE" | jq -r '.commit.commit.author.name')
-
-        # 디버깅 출력
-        echo "Repository: $ORIGINAL_REPO"
-        echo "Branch: $ORIGINAL_BRANCH"
-        echo "Last Commit SHA: $LAST_COMMIT_SHA"
-        echo "Last Commit Message: $LAST_COMMIT_MESSAGE"
-        echo "Last Commit Author: $LAST_COMMIT_AUTHOR"
-        echo "Workflow File URL: $WORKFLOW_FILE_URL"
 
         # Webhook 데이터 구성
         curl -H "Content-Type: application/json" \
