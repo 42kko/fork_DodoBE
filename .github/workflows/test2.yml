@@ -11,13 +11,14 @@ jobs:
     steps:
     - name: Fetch Last Push Info from Original Repo
       env:
-        GITHUB_TOKEN: ${{ secrets.TEST }} # GitHub Token 설정
+        GITHUB_TOKEN: ${{ secrets.TEST }}
         DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_FULLSTACK }}
       run: |
         # 환경변수 설정
         ORIGINAL_REPO="DoDoDocs/dododocs-backend"
         ORIGINAL_BRANCH="main"
         ORIGINAL_REPO_URL="https://github.com/$ORIGINAL_REPO"
+        WORKFLOW_FILE_URL="$ORIGINAL_REPO_URL/blob/$ORIGINAL_BRANCH/.github/workflows/krampoline-noti.yml.disable"
 
         # API 호출
         API_URL="https://api.github.com/repos/$ORIGINAL_REPO/branches/$ORIGINAL_BRANCH"
@@ -37,6 +38,7 @@ jobs:
         echo "Last Commit SHA: $LAST_COMMIT_SHA"
         echo "Last Commit Message: $LAST_COMMIT_MESSAGE"
         echo "Last Commit Author: $LAST_COMMIT_AUTHOR"
+        echo "Workflow File URL: $WORKFLOW_FILE_URL"
 
         # Webhook 데이터 구성
         curl -H "Content-Type: application/json" \
@@ -46,7 +48,7 @@ jobs:
               {
                 \"color\": 16739652,
                 \"timestamp\": \"$(date -u +"%Y-%m-%dT%H:%M:%SZ")\",
-                \"title\": \"❗️ Remind : 크램폴린 CI/CD ❗️\",
+                \"title\": \"Success: ❗️ Remind : 크램폴린 CI/CD ❗️\",
                 \"description\": \"크램폴린에서 D2Hub 빌드와 Kargo 배포를 진행해주세요.\\n[여기](https://krampoline-ide.kakao.com/organization/org_ffYH4PrzrR6et39c2k/dashboard)를 눌러 크램폴린IDE로 들어가세요!\",
                 \"fields\": [
                   {
@@ -60,13 +62,18 @@ jobs:
                     \"inline\": true
                   },
                   {
-                    \"name\": \"Last Commit\",
-                    \"value\": \"[\`${LAST_COMMIT_SHA:0:7}\`]($ORIGINAL_REPO_URL/commit/$LAST_COMMIT_SHA)\\n$LAST_COMMIT_MESSAGE\",
+                    \"name\": \"Event - push\",
+                    \"value\": \"[\`${LAST_COMMIT_SHA:0:7}\`]($ORIGINAL_REPO_URL/commit/$LAST_COMMIT_SHA) $LAST_COMMIT_MESSAGE\",
                     \"inline\": false
                   },
                   {
                     \"name\": \"Triggered by\",
                     \"value\": \"$LAST_COMMIT_AUTHOR\",
+                    \"inline\": true
+                  },
+                  {
+                    \"name\": \"Workflow\",
+                    \"value\": \"[Krampoline Notification]($WORKFLOW_FILE_URL)\",
                     \"inline\": true
                   }
                 ]
