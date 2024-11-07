@@ -11,40 +11,29 @@ jobs:
     steps:
     - name: Fetch Last Push Info from Original Repo
       env:
-        GITHUB_TOKEN: ${{ secrets.TEST }} # 원본 레포 정보에 접근하기 위한 Token
-        ORIGINAL_REPO: "DoDoDocs/dododocs-backend" # 원본 레포 이름
-        ORIGINAL_BRANCH: "main" # 원본 레포의 브랜치 이름
+        GITHUB_TOKEN: ${{ secrets.MY_PERSONAL_ACCESS_TOKEN }}
       run: |
-        # GitHub API로 원본 레포의 브랜치 정보 가져오기
-        LAST_COMMIT_INFO=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
+        # GitHub API로 원본 레포 정보 가져오기
+        ORIGINAL_REPO="DoDoDocs/dododocs-backend"
+        ORIGINAL_BRANCH="main"
+
+        # API 호출 및 JSON 파싱
+        API_RESPONSE=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
           "https://api.github.com/repos/$ORIGINAL_REPO/branches/$ORIGINAL_BRANCH")
+        
+        # 데이터 추출
+        LAST_COMMIT_SHA=$(echo "$API_RESPONSE" | jq -r '.commit.sha')
+        LAST_COMMIT_MESSAGE=$(echo "$API_RESPONSE" | jq -r '.commit.commit.message')
+        LAST_COMMIT_AUTHOR=$(echo "$API_RESPONSE" | jq -r '.commit.commit.author.name')
+        ORIGINAL_REPO_URL="https://github.com/$ORIGINAL_REPO"
 
-        # JSON 파싱으로 필요한 데이터 추출
-        LAST_COMMIT_SHA=$(echo "$LAST_COMMIT_INFO" | jq -r '.commit.sha')
-        LAST_COMMIT_MESSAGE=$(echo "$LAST_COMMIT_INFO" | jq -r '.commit.commit.message')
-        LAST_COMMIT_AUTHOR=$(echo "$LAST_COMMIT_INFO" | jq -r '.commit.commit.author.name')
-
-        # SHA를 슬라이싱한 SHORT_SHA 생성
-        SHORT_COMMIT_SHA=${LAST_COMMIT_SHA:0:7}
-
-        # 환경변수 설정
-        echo "LAST_COMMIT_SHA=$LAST_COMMIT_SHA" >> $GITHUB_ENV
-        echo "LAST_COMMIT_MESSAGE=$LAST_COMMIT_MESSAGE" >> $GITHUB_ENV
-        echo "LAST_COMMIT_AUTHOR=$LAST_COMMIT_AUTHOR" >> $GITHUB_ENV
-        echo "SHORT_COMMIT_SHA=$SHORT_COMMIT_SHA" >> $GITHUB_ENV
-
-    - name: Debug Updated Variables
-      run: |
+        # 디버깅 출력
+        echo "Repository URL: $ORIGINAL_REPO_URL"
         echo "Last Commit SHA: $LAST_COMMIT_SHA"
-        echo "Short Commit SHA: $SHORT_COMMIT_SHA"
         echo "Last Commit Message: $LAST_COMMIT_MESSAGE"
         echo "Last Commit Author: $LAST_COMMIT_AUTHOR"
 
-    - name: Send Discord Webhook
-      env:
-        DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_FULLSTACK }}
-      run: |
-        # Discord Webhook으로 데이터 전송
+        # Discord Webhook 전송
         curl -H "Content-Type: application/json" \
           -X POST \
           -d '{
@@ -57,22 +46,22 @@ jobs:
                 "fields": [
                   {
                     "name": "Repository",
-                    "value": "[${{ env.ORIGINAL_REPO }}](https://github.com/${{ env.ORIGINAL_REPO }})",
+                    "value": "[${ORIGINAL_REPO}](${ORIGINAL_REPO_URL})",
                     "inline": true
                   },
                   {
                     "name": "Ref",
-                    "value": "refs/heads/${{ env.ORIGINAL_BRANCH }}",
+                    "value": "refs/heads/${ORIGINAL_BRANCH}",
                     "inline": true
                   },
                   {
                     "name": "Last Commit",
-                    "value": "[`${{ env.SHORT_COMMIT_SHA }}`](https://github.com/${{ env.ORIGINAL_REPO }}/commit/${{ env.LAST_COMMIT_SHA }})\n${{ env.LAST_COMMIT_MESSAGE }}",
+                    "value": "[`${LAST_COMMIT_SHA:0:7}`](${ORIGINAL_REPO_URL}/commit/${LAST_COMMIT_SHA})\n${LAST_COMMIT_MESSAGE}",
                     "inline": false
                   },
                   {
                     "name": "Triggered by",
-                    "value": "${{ env.LAST_COMMIT_AUTHOR }}",
+                    "value": "${LAST_COMMIT_AUTHOR}",
                     "inline": true
                   }
                 ]
