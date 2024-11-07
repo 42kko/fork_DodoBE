@@ -11,10 +11,6 @@
 
 include::{snippets}/auth/generate/link/http-request.adoc[]
 
-===== Request URI Path Parameters
-
-include::{snippets}/auth/generate/link/path-parameters.adoc[]
-
 ==== HTTP Response
 
 include::{snippets}/auth/generate/link/http-response.adoc[]
@@ -30,10 +26,6 @@ include::{snippets}/auth/generate/link/response-fields.adoc[]
 ==== HTTP Request
 
 include::{snippets}/auth/generate/token/success/http-request.adoc[]
-
-===== Request URI Path Parameters
-
-include::{snippets}/auth/generate/token/success/path-parameters.adoc[]
 
 ===== Request Body
 

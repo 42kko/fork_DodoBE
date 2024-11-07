@@ -22,6 +22,7 @@ logging:
           descriptor:
             sql:
               BasicBinder: TRACE
+  exception-conversion-word:
 oauth:
   github:
     authorize_uri: https://kauth.kakao.com/oauth/authorize

@@ -9,5 +9,4 @@ public class DododocsApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(DododocsApplication.class, args);
 	}
-
 }

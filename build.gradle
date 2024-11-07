@@ -56,9 +56,9 @@ dependencies {
 	asciidoctorExtensions 'org.springframework.restdocs:spring-restdocs-asciidoctor'
 }
 
-tasks.named('test') {
-	useJUnitPlatform()
+test {
 	outputs.dir snippetsDir
+	useJUnitPlatform()
 }
 
 asciidoctor { // (7)
@@ -69,6 +69,15 @@ asciidoctor { // (7)
 		include("**/index.adoc")
 	}
 	baseDirFollowsSourceFile()
+}
+
+tasks.named('asciidoctor') {
+	doLast {
+		copy {
+			from "${asciidoctor.outputDir}"
+			into "src/main/resources/static/docs"
+		}
+	}
 }
 
 tasks.named('build') {
