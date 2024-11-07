@@ -36,6 +36,7 @@ jobs:
         echo "Ref: $GITHUB_REF"
         export GITHUB_TRIGGERING_ACTOR="notme"
         export GITHUB_ACTOR="notme23"
+        export GITHUB_REF="123"
         echo "====="
         env
 
