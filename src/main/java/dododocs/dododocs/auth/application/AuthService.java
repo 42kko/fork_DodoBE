@@ -13,23 +13,23 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 @Service
 public class AuthService {
-    private final GithubOAuthUriProvider oAuthUriProvider;
+    private final GithubOAuthUriProvider githubOAuthUriProvider;
     private final JwtTokenCreator jwtTokenCreator;
     private final GithubOAuthClient githubOAuthClient;
     private final MemberRepository memberRepository;
 
-    public AuthService(final GithubOAuthUriProvider oAuthUriProvider,
+    public AuthService(final GithubOAuthUriProvider githubOAuthUriProvider,
                        final JwtTokenCreator jwtTokenCreator,
                        final GithubOAuthClient githubOAuthClient,
                        final MemberRepository memberRepository) {
-        this.oAuthUriProvider = oAuthUriProvider;
+        this.githubOAuthUriProvider = githubOAuthUriProvider;
         this.jwtTokenCreator = jwtTokenCreator;
         this.githubOAuthClient = githubOAuthClient;
         this.memberRepository = memberRepository;
     }
 
     public String generateUri() {
-        return oAuthUriProvider.generateUri();
+        return githubOAuthUriProvider.generateUri();
     }
 
     public String generateTokenWithCode(final String code) {

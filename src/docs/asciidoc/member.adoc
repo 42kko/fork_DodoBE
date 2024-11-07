@@ -1,0 +1,28 @@
+== ⛳️ Member (멤버)
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 2
+
+=== 멤버의 깃허브 레포지토리 이름 리스트 조회
+
+==== HTTP Request
+
+include::{snippets}/member/repos/http-request.adoc[]
+
+===== Request Header
+
+include::{snippets}/member/repos/request-headers.adoc[]
+
+===== Request Body
+
+include::{snippets}/member/repos/request-body.adoc[]
+
+==== HTTP Response
+
+include::{snippets}/member/repos/http-response.adoc[]
+
+===== Response Body
+
+include::{snippets}/member/repos/response-fields.adoc[]

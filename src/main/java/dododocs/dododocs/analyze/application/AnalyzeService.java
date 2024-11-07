@@ -20,12 +20,8 @@ import java.util.zip.ZipOutputStream;
 
 @Service
 public class AnalyzeService {
-    private final AmazonS3 amazonS3Client;
     private final String bucketName = "haon-dododocs"; // S3 버킷 이름
 
-    public AnalyzeService(AmazonS3 amazonS3Client) {
-        this.amazonS3Client = amazonS3Client;
-    }
 
     public void uploadZipToS3(String fileName) {
         try {
@@ -48,7 +44,7 @@ public class AnalyzeService {
             metadata.setContentType("application/zip");
 
             // 4. S3에 ZIP 파일 업로드
-            amazonS3Client.putObject(bucketName, fileName + ".zip", inputStream, metadata);
+            // amazonS3Client.putObject(bucketName, fileName + ".zip", inputStream, metadata);
 
             System.out.println("ZIP 파일 업로드 성공: " + fileName + ".zip");
 

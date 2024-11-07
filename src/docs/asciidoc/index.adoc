@@ -1,0 +1,9 @@
+= 📚️ DoDoDocs API 문서
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 2
+
+include::auth.adoc[]
+include::member.adoc[]
