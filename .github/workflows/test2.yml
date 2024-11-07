@@ -11,29 +11,53 @@ jobs:
     steps:
     - name: Fetch Last Push Info from Original Repo
       env:
-        GITHUB_TOKEN: ${{ secrets.TEST }}
+        GITHUB_TOKEN: ${{ secrets.TEST }} # GitHub Token 설정
       run: |
-        # GitHub API로 원본 레포 정보 가져오기
+        # 환경변수 설정
         ORIGINAL_REPO="DoDoDocs/dododocs-backend"
         ORIGINAL_BRANCH="main"
 
-        # API 호출 및 JSON 파싱
-        API_RESPONSE=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
-          "https://api.github.com/repos/$ORIGINAL_REPO/branches/$ORIGINAL_BRANCH")
-        
-        # 데이터 추출
+        # API URL 생성
+        API_URL="https://api.github.com/repos/$ORIGINAL_REPO/branches/$ORIGINAL_BRANCH"
+        echo "API URL: $API_URL"
+
+        # API 호출
+        API_RESPONSE=$(curl -s -H "Authorization: token $GITHUB_TOKEN" "$API_URL")
+        echo "API Response: $API_RESPONSE"
+
+        # 오류 처리
+        if [ -z "$API_RESPONSE" ] || [[ "$API_RESPONSE" == *"Not Found"* ]]; then
+          echo "API call failed. Please check the URL, branch, or token."
+          exit 1
+        fi
+
+        # JSON 파싱
         LAST_COMMIT_SHA=$(echo "$API_RESPONSE" | jq -r '.commit.sha')
         LAST_COMMIT_MESSAGE=$(echo "$API_RESPONSE" | jq -r '.commit.commit.message')
         LAST_COMMIT_AUTHOR=$(echo "$API_RESPONSE" | jq -r '.commit.commit.author.name')
-        ORIGINAL_REPO_URL="https://github.com/$ORIGINAL_REPO"
 
         # 디버깅 출력
-        echo "Repository URL: $ORIGINAL_REPO_URL"
         echo "Last Commit SHA: $LAST_COMMIT_SHA"
         echo "Last Commit Message: $LAST_COMMIT_MESSAGE"
         echo "Last Commit Author: $LAST_COMMIT_AUTHOR"
 
-        # Discord Webhook 전송
+        # 오류 처리
+        if [ "$LAST_COMMIT_SHA" = "null" ] || [ -z "$LAST_COMMIT_SHA" ]; then
+          echo "Failed to fetch commit details. Exiting."
+          exit 1
+        fi
+
+    - name: Send Discord Webhook
+      env:
+        DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_FULLSTACK }}
+        GITHUB_TOKEN: ${{ secrets.TEST }}
+      run: |
+        # Repository URL 구성
+        ORIGINAL_REPO="DoDoDocs/dododocs-backend"
+        ORIGINAL_BRANCH="main"
+        ORIGINAL_REPO_URL="https://github.com/$ORIGINAL_REPO"
+
+        # Webhook 데이터 전송
         curl -H "Content-Type: application/json" \
           -X POST \
           -d '{
