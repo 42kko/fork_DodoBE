@@ -1,0 +1,58 @@
+name: Krampoline Notification
+
+on: 
+  push:
+    branches:
+      - main
+
+jobs:
+  noti:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Fetch Last Push Info from Original Repo
+      env:
+        GITHUB_TOKEN: ${{ secrets.KRAMPOLINE_TESTREPOKEY }} # Personal Access Token (PAT)
+        ORIGINAL_REPO: "42kko/fork_dodoBE" # 원본 레포 이름
+        ORIGINAL_BRANCH: "main"           # 브랜치 이름
+      run: |
+        # GitHub API 호출로 원본 레포의 브랜치 정보 가져오기
+        LAST_PUSH_INFO=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
+          "https://api.github.com/repos/$ORIGINAL_REPO/branches/$ORIGINAL_BRANCH")
+
+        # JSON 파싱을 위해 jq 사용
+        LAST_COMMIT_SHA=$(echo "$LAST_PUSH_INFO" | jq -r '.commit.sha')
+        LAST_COMMIT_MESSAGE=$(echo "$LAST_PUSH_INFO" | jq -r '.commit.commit.message')
+        LAST_COMMIT_AUTHOR=$(echo "$LAST_PUSH_INFO" | jq -r '.commit.commit.author.name')
+
+        # 환경변수로 저장
+        echo "REPO=$ORIGINAL_REPO" >> $GITHUB_ENV
+        echo "REF=refs/heads/$ORIGINAL_BRANCH" >> $GITHUB_ENV
+        echo "EVENT_NAME=push" >> $GITHUB_ENV
+        echo "ACTOR=$LAST_COMMIT_AUTHOR" >> $GITHUB_ENV
+        echo "LAST_COMMIT_SHA=$LAST_COMMIT_SHA" >> $GITHUB_ENV
+        echo "LAST_COMMIT_MESSAGE=$LAST_COMMIT_MESSAGE" >> $GITHUB_ENV
+
+    - name: Debug - Check Updated Variables
+      run: |
+        echo "Repository: $REPO"
+        echo "Ref: $REF"
+        echo "Event Name: $EVENT_NAME"
+        echo "Triggered by: $ACTOR"
+        echo "Last Commit SHA: $LAST_COMMIT_SHA"
+        echo "Last Commit Message: $LAST_COMMIT_MESSAGE"
+
+    - name: Send Discord Notification
+      uses: sarisia/actions-status-discord@v1.15.0
+      with:
+        webhook: ${{ secrets.DISCORD_WEBHOOK_FULLSTACK }}
+        title: "❗️ Remind : 크램폴린 CI/CD ❗️"
+        description: |
+          크램폴린에서 D2Hub 빌드와 Kargo 배포를 진행해주세요.
+          [여기](https://krampoline-ide.kakao.com/organization/org_ffYH4PrzrR6et39c2k/dashboard)를 눌러 크램폴린IDE로 들어가세요!
+          ---
+          Repository: ${{ env.REPO }}
+          Ref: ${{ env.REF }}
+          Event: ${{ env.EVENT_NAME }}
+          Triggered by: ${{ env.ACTOR }}
+          Last Commit: ${{ env.LAST_COMMIT_MESSAGE }}
+        color: 0xff6d44
