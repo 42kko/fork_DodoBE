@@ -3,9 +3,9 @@ spring:
     name: dododocs
   datasource:
     # driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://mysql:3306/dodocs
-    username: root
-    password: root
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
   jpa:
     properties:
       hibernate:
@@ -24,12 +24,12 @@ spring:
               BasicBinder: TRACE
 oauth:
   github:
-    authorize_uri: https://github.com/login/oauth/authorize
-    redirect_uri: http://localhost:3000/callback/github
-    client_secret: 956682ca8f12648d6c8715460efbf0207578ed37
-    token_uri: https://github.com/login/oauth/access_token
-    user_uri: https://api.github.com/user
-    client_id: Ov23li8DXFjxGqJaQPfq
+    authorize_uri: ${AUTHORIZE_URI}
+    redirect_uri: ${REDIRECT_URI}
+    client_secret: ${CLIENT_SECRET}
+    token_uri: ${TOKEN_URL}
+    user_uri: ${USER_URI}
+    client_id: ${CLIENT_ID}
 
 security:
   jwt:
@@ -44,10 +44,10 @@ cloud:
     s3:
       bucket: haon-dododocs
     stack.auto: false
-    region.static: ap-northeast-2
+    region.static: ${AWS_REGION}
     credentials:
-      accessKey: 123
-      secretKey: 123
+      accessKey: ${AWS_CREDEZNTIALS_ACCESSKEY}
+      secretKey: ${AWS_CREDEZNTIALS_SECRETKEY}
 
 
 
