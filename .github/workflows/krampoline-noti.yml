@@ -16,7 +16,7 @@ jobs:
       run: |
         # 환경변수 설정
         ORIGINAL_REPO="DoDoDocs/dododocs-backend"
-        ORIGINAL_BRANCH="main"
+        ORIGINAL_BRANCH="develop"
         ORIGINAL_REPO_URL="https://github.com/$ORIGINAL_REPO"
         WORKFLOW_FILE_URL="$ORIGINAL_REPO_URL/blob/$ORIGINAL_BRANCH/.github/workflows/krampoline-noti.yml.disable"
 
