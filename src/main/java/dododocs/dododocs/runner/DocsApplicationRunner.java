@@ -15,6 +15,8 @@ public class DocsApplicationRunner implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
+        log.info("=====================================================");
         log.info("DATABASE URL: {}", dbUrl);
+        log.info("=====================================================");
     }
 }
