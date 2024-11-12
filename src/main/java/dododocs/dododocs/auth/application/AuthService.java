@@ -32,6 +32,7 @@ public class AuthService {
         return githubOAuthUriProvider.generateUri();
     }
 
+    @Transactional
     public String generateTokenWithCode(final String code) {
         final GithubOAuthMember githubOAuthMember = githubOAuthClient.getOAuthMember(code);
         final Member foundMember = findOrCreateMember(githubOAuthMember);
