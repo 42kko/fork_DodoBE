@@ -26,7 +26,7 @@ public class MemberService {
     public FindRepoNameListResponse getUserRepositories(final long memberId) {
         final Member member = memberRepository.findById(memberId)
                 .orElseThrow(NoExistMemberException::new);
-        final String memberName = member.getOriginName();
+        final String memberName = member.getNickname();
         final String url = "https://api.github.com/users/" + memberName + "/repos";
 
         // GitHub API 호출하여 레포지토리 목록 가져오기

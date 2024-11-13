@@ -14,13 +14,11 @@ public class RestTemplateConfig {
 
     @Bean
     public RestTemplate restTemplate() {
-        /* SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
+        SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
 
         Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("krmp-proxy.9rum.cc", 3128));
         factory.setProxy(proxy);
 
-        return new RestTemplate(factory); */
-
-        return new RestTemplate();
+        return new RestTemplate(factory);
     }
 }

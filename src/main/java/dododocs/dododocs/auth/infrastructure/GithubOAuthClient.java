@@ -61,7 +61,7 @@ public class GithubOAuthClient {
 
         params.add("client_id", clientId);
         params.add("client_secret", clientSecret);
-        params.add("code",code);
+        params.add("code", code);
         params.add("redirect_uri", redirectUri);
 
         final HttpEntity<MultiValueMap<String, String>> accessTokenRequestEntity = new HttpEntity<>(params, httpHeaders);
