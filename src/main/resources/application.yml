@@ -2,7 +2,7 @@ spring:
   application:
     name: dododocs
   datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
+    # driver-class-name: com.mysql.cj.jdbc.Driver
     url: ${DB_URL}
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
@@ -25,7 +25,7 @@ spring:
 oauth:
   github:
     authorize_uri: ${AUTHORIZE_URI}
-    redirect_uri: ${REDIRECT_URI}
+    redirect_uri: https://kcfaa61d53ebba.user-app.krampoline.com/callback/github
     client_secret: ${CLIENT_SECRET}
     token_uri: ${TOKEN_URL}
     user_uri: ${USER_URI}
