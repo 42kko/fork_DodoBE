@@ -35,21 +35,15 @@ public class AuthService {
     @Transactional
     public String generateTokenWithCode(final String code) {
         final GithubOAuthMember githubOAuthMember = githubOAuthClient.getOAuthMember(code);
+
+        System.out.println("🔥 ======================================");
+        System.out.println("email:" + githubOAuthMember.getEmail());
+        System.out.println("nickname:" + githubOAuthMember.getNickName());
+        System.out.println("originName:" + githubOAuthMember.getOriginName());
+        System.out.println("❤️ ======================================");
+
         final Member foundMember = findOrCreateMember(githubOAuthMember);
         final String accessToken = jwtTokenCreator.createToken(foundMember.getId());
-
-        System.out.println("========================");
-        System.out.println(memberRepository.findById(1L).get().getOriginName());
-        System.out.println(memberRepository.findById(1L).get().getEmail());
-        System.out.println(memberRepository.findById(1L).get().getNickname());
-        System.out.println("=====");
-
-        System.out.println(memberRepository.findByEmail(foundMember.getEmail()).getId());
-        System.out.println(memberRepository.findByEmail(foundMember.getEmail()).getNickname());
-        System.out.println(memberRepository.findByEmail(foundMember.getEmail()).getOriginName());
-        System.out.println("========================");
-
-
         return accessToken;
     }
 
