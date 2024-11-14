@@ -16,18 +16,25 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Transactional
-@RequiredArgsConstructor
 @Service
 public class MemberService {
     private final MemberRepository memberRepository;
-    private final RestTemplate restTemplate = new RestTemplate();
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final RestTemplate restTemplate;
+    private final ObjectMapper objectMapper;
+
+    public MemberService(final MemberRepository memberRepository, final RestTemplate restTemplate, final ObjectMapper objectMapper) {
+        this.memberRepository = memberRepository;
+        this.restTemplate = restTemplate;
+        this.objectMapper = objectMapper;
+    }
 
     public FindRepoNameListResponse getUserRepositories(final long memberId) {
         final Member member = memberRepository.findById(memberId)
                 .orElseThrow(NoExistMemberException::new);
         final String memberName = member.getOriginName();
         final String url = "https://api.github.com/users/" + memberName + "/repos";
+
+        System.out.println("🔥 request url:" + url);
 
         // GitHub API 호출하여 레포지토리 목록 가져오기
         Object response = restTemplate.getForObject(url, Object.class);
