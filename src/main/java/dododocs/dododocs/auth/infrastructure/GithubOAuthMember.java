@@ -5,8 +5,8 @@ import lombok.Getter;
 
 @Getter
 public class GithubOAuthMember {
-    @JsonProperty("email")
-    private String email;
+    @JsonProperty("id")
+    private Long socialLoginId;
 
     @JsonProperty("name")
     private String nickName;
@@ -14,8 +14,8 @@ public class GithubOAuthMember {
     @JsonProperty("login")
     private String originName;
 
-    public GithubOAuthMember(final String email, final String nickName, final  String originName) {
-        this.email = email;
+    public GithubOAuthMember(final Long socialLoginId, final String nickName, final  String originName) {
+        this.socialLoginId = socialLoginId;
         this.nickName = nickName;
         this.originName = originName;
     }

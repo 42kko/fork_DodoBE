@@ -37,7 +37,7 @@ public class AuthService {
         final GithubOAuthMember githubOAuthMember = githubOAuthClient.getOAuthMember(code);
 
         System.out.println("🔥 ======================================");
-        System.out.println("email:" + githubOAuthMember.getEmail());
+        System.out.println("socialLoginId:" + githubOAuthMember.getSocialLoginId());
         System.out.println("nickname:" + githubOAuthMember.getNickName());
         System.out.println("originName:" + githubOAuthMember.getOriginName());
         System.out.println("❤️ ======================================");
@@ -48,17 +48,17 @@ public class AuthService {
     }
 
     public Member findOrCreateMember(final GithubOAuthMember githubOAuthmember) {
-        final String email = githubOAuthmember.getEmail();
+        final Long socialLoginId = githubOAuthmember.getSocialLoginId();
 
-        if(!memberRepository.existsByEmail(email)) {
+        if(!memberRepository.existsBySocialLoginId(socialLoginId)) {
             memberRepository.save(generateMember(githubOAuthmember));
         }
-        final Member foundMember = memberRepository.findByEmail(email);
+        final Member foundMember = memberRepository.findBySocialLoginId(socialLoginId);
         return foundMember;
     }
 
     private Member generateMember(final GithubOAuthMember githubOAuthMember) {
-        return new Member(githubOAuthMember.getEmail(), githubOAuthMember.getNickName(), githubOAuthMember.getOriginName());
+        return new Member(githubOAuthMember.getSocialLoginId(), githubOAuthMember.getNickName(), githubOAuthMember.getOriginName());
     }
 
     public Long extractMemberId(final String accessToken) {

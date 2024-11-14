@@ -22,5 +22,6 @@ public class RestTemplateConfig {
         factory.setProxy(proxy);
 
         return new RestTemplate(factory);
+        // return new RestTemplate();
     }
 }

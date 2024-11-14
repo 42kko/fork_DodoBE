@@ -34,7 +34,7 @@ public class ApiTestController {
     public ResponseEntity<Void> insertMember() {
         Member member = memberRepository.save(new Member("email"));
         System.out.println(member.getId());
-        System.out.println(member.getEmail());
+        System.out.println(member.getSocialLoginId());
         return ResponseEntity.noContent().build();
     }
 
