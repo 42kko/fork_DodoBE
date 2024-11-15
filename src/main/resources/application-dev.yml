@@ -1,0 +1,53 @@
+spring:
+  application:
+    name: dododocs
+  datasource:
+    # driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+  jpa:
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.MySQL8Dialect
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+  level:
+    org:
+      hibernate:
+        type:
+          descriptor:
+            sql:
+              BasicBinder: TRACE
+oauth:
+  github:
+    authorize_uri: ${AUTHORIZE_URI}
+    redirect_uri: ${REDIRECT_URI}
+    client_secret: ${CLIENT_SECRET}
+    token_uri: ${TOKEN_URL}
+    user_uri: ${USER_URI}
+    client_id: ${CLIENT_ID}
+
+security:
+  jwt:
+    token:
+      secret_key: secretsecretsecretsecretsecretsecret
+      expire_length:
+        access_token: 36000000
+        refresh_token: 36000000
+
+cloud:
+  aws:
+    s3:
+      bucket: haon-dododocs
+    stack.auto: false
+    region.static: ${AWS_REGION}
+    credentials:
+      accessKey: ${AWS_CREDEZNTIALS_ACCESSKEY}
+      secretKey: ${AWS_CREDEZNTIALS_SECRETKEY}
+
+
+
