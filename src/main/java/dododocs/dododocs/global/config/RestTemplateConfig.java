@@ -15,13 +15,19 @@ import java.net.Proxy;
 public class RestTemplateConfig {
 
     @Bean
-    public RestTemplate restTemplate() {
+    @Profile({"dev", "prod"})
+    public RestTemplate restTemplateWithProxy() {
         SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
 
         Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("krmp-proxy.9rum.cc", 3128));
         factory.setProxy(proxy);
 
         return new RestTemplate(factory);
-        // return new RestTemplate();
+    }
+
+    @Bean
+    @Profile({"default", "local", "test"})
+    public RestTemplate simpleRestTemplate() {
+        return new RestTemplate();
     }
 }
