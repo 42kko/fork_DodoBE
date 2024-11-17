@@ -1,6 +1,7 @@
 package dododocs.dododocs.analyze.application;
 
 import com.amazonaws.services.s3.AmazonS3Client;
+import dododocs.dododocs.analyze.domain.repository.MemberOrganizationRepository;
 import dododocs.dododocs.auth.domain.repository.MemberRepository;
 import dododocs.dododocs.auth.exception.NoExistMemberException;
 import dododocs.dododocs.member.domain.Member;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.net.URLConnection;
+import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -25,27 +27,56 @@ import java.util.zip.ZipOutputStream;
 public class AnalyzeService {
     private final MemberRepository memberRepository;
     private final AmazonS3Client amazonS3Client;
+    private final MemberOrganizationRepository memberOrganizationRepository;
 
     // GitHub 레포지토리를 ZIP 파일로 가져와 S3에 업로드
     public void uploadGithubRepoToS3(final long memberId, String repoName, String branchName) throws IOException {
-        // GitHub 레포지토리를 ZIP 파일로 다운로드
+        // Member를 조회
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(NoExistMemberException::new);
 
+        // 개인 소유자로 먼저 시도
         String ownerName = member.getOriginName();
-        String bucketDetailName = ownerName + "-" + repoName;
+        boolean success = tryUploadFromOwner(ownerName, repoName, branchName);
 
-        String downloadUrl = String.format("https://github.com/%s/%s/archive/refs/heads/%s.zip", ownerName, repoName, branchName);
+        // 개인 소유에서 찾지 못하면 조직 소유로 검색
+        if (!success) {
+            List<String> organizationNames = findOrganizationNames(member);
+            for (String orgName : organizationNames) {
+                success = tryUploadFromOwner(orgName, repoName, branchName);
+                if (success) {
+                    break;
+                }
+            }
+        }
 
-        // ZIP 파일을 임시 디렉토리에 저장
-        File tempFile = File.createTempFile(repoName, ".zip");
-        downloadFileFromUrl(downloadUrl, tempFile);
+        if (!success) {
+            throw new IllegalArgumentException("Could not find repository " + repoName + " under any owner.");
+        }
+    }
 
-        // S3에 업로드
-        amazonS3Client.putObject("haon-dododocs", bucketDetailName, tempFile);
+    // 특정 소유자(개인 또는 조직)에서 레포지토리를 찾아 업로드 시도
+    private boolean tryUploadFromOwner(String ownerName, String repoName, String branchName) {
+        try {
+            String bucketDetailName = ownerName + "-" + repoName;
+            String downloadUrl = String.format("https://github.com/%s/%s/archive/refs/heads/%s.zip", ownerName, repoName, branchName);
 
-        // 업로드 후 임시 파일 삭제
-        tempFile.delete();
+            // ZIP 파일을 임시 디렉토리에 저장
+            File tempFile = File.createTempFile(repoName, ".zip");
+            downloadFileFromUrl(downloadUrl, tempFile);
+
+            // S3에 업로드
+            amazonS3Client.putObject("haon-dododocs", bucketDetailName, tempFile);
+
+            // 업로드 후 임시 파일 삭제
+            tempFile.delete();
+            return true;
+        } catch (IOException e) {
+            // 레포지토리를 찾지 못하거나 다운로드 실패 시 false 반환
+            System.err.println("Failed to upload repository from owner: " + ownerName);
+            e.printStackTrace();
+            return false;
+        }
     }
 
     // URL에서 파일 다운로드
@@ -61,5 +92,10 @@ public class AnalyzeService {
                 outputStream.write(buffer, 0, bytesRead);
             }
         }
+    }
+
+    // 특정 멤버의 조직 이름 리스트 반환
+    private List<String> findOrganizationNames(final Member member) {
+        return memberOrganizationRepository.findOrganizationNamesByMember(member);
     }
 }

@@ -6,10 +6,13 @@ import dododocs.dododocs.auth.infrastructure.GithubOAuthMember;
 import dododocs.dododocs.auth.domain.GithubOAuthUriProvider;
 import dododocs.dododocs.auth.domain.JwtTokenCreator;
 import dododocs.dododocs.auth.domain.repository.MemberRepository;
+import dododocs.dododocs.auth.infrastructure.GithubOrganizationClient;
 import dododocs.dododocs.member.domain.Member;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@RequiredArgsConstructor
 @Transactional(readOnly = true)
 @Service
 public class AuthService {
@@ -17,23 +20,14 @@ public class AuthService {
     private final JwtTokenCreator jwtTokenCreator;
     private final GithubOAuthClient githubOAuthClient;
     private final MemberRepository memberRepository;
-
-    public AuthService(final GithubOAuthUriProvider githubOAuthUriProvider,
-                       final JwtTokenCreator jwtTokenCreator,
-                       final GithubOAuthClient githubOAuthClient,
-                       final MemberRepository memberRepository) {
-        this.githubOAuthUriProvider = githubOAuthUriProvider;
-        this.jwtTokenCreator = jwtTokenCreator;
-        this.githubOAuthClient = githubOAuthClient;
-        this.memberRepository = memberRepository;
-    }
+    private final GithubOrganizationClient githubOrganizationClient;
 
     public String generateUri() {
         return githubOAuthUriProvider.generateUri();
     }
 
     @Transactional
-    public String generateTokenWithCode(final String code) {
+    public String generateTokenWithCode(final String code) throws Exception {
         final GithubOAuthMember githubOAuthMember = githubOAuthClient.getOAuthMember(code);
 
         System.out.println("🔥 ======================================");
@@ -43,6 +37,7 @@ public class AuthService {
         System.out.println("❤️ ======================================");
 
         final Member foundMember = findOrCreateMember(githubOAuthMember);
+        githubOrganizationClient.saveMemberOrganizationNames(foundMember, githubOAuthMember.getOriginName());
         final String accessToken = jwtTokenCreator.createToken(foundMember.getId());
         return accessToken;
     }

@@ -24,7 +24,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AccessTokenResponse> login(@RequestBody final LoginRequest loginRequest) {
+    public ResponseEntity<AccessTokenResponse> login(@RequestBody final LoginRequest loginRequest) throws Exception {
         final String accessToken = authService.generateTokenWithCode(loginRequest.getCode());
         return ResponseEntity.status(CREATED).body(new AccessTokenResponse(accessToken));
     }
