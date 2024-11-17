@@ -4,16 +4,16 @@ package dododocs.dododocs.analyze.presentation;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dododocs.dododocs.analyze.application.AnalyzeService;
+import dododocs.dododocs.analyze.dto.UploadGitRepoContentToS3Request;
+import dododocs.dododocs.auth.dto.Accessor;
+import dododocs.dododocs.auth.presentation.authentication.Authentication;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.ByteArrayOutputStream;
@@ -93,28 +93,25 @@ public class AnalyzeController {
         }
     }
 
-    @GetMapping("/github-repo-zip")
-    public ResponseEntity<Resource> downloadGithubRepositoryAsZip() throws Exception {
+    @GetMapping("/upload/s3")
+    public String uploadGithubToS3(@Authentication final Accessor accessor,
+                                   @RequestBody final UploadGitRepoContentToS3Request uploadToS3Request) {
+
         String owner = "msung99";   // => gitHub 사용자명 또는 조직명
         String repo = "Gatsby-Starter-Haon";   // => 레포지토리 이름
         String branch = "main";      // => main
+        String bucketName = "haon-dododocs";
+        String s3Key = "open-source";
 
-        String downloadUrl = String.format("https://github.com/%s/%s/archive/refs/heads/%s.zip", owner, repo, branch);
-
-        // URL에서 InputStream 가져오기
-        InputStream inputStream = new URL(downloadUrl).openStream();
-        InputStreamResource resource = new InputStreamResource(inputStream);
-
-        // HTTP 헤더 설정
-        HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + repo + "-" + branch + ".zip\"");
-
-        analyzeService.uploadZipToS3(repo);
-
-        return ResponseEntity.ok()
-                .headers(headers)
-                .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                .body(resource);
+        try {
+            System.out.println("===========");
+            System.out.println(uploadToS3Request.getRepositoryName());
+            analyzeService.uploadGithubRepoToS3(accessor.getId(), uploadToS3Request.getRepositoryName(), uploadToS3Request.getBranchName());
+            return "GitHub repository successfully uploaded to S3!";
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "Failed to upload GitHub repository to S3: " + e.getMessage();
+        }
     }
 }
 
