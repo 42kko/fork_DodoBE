@@ -1,6 +1,9 @@
 package dododocs.dododocs.analyze.application;
 
 import com.amazonaws.services.s3.AmazonS3Client;
+import dododocs.dododocs.analyze.domain.RepoAnalyze;
+import dododocs.dododocs.analyze.domain.repository.RepoAnalyzeRepository;
+import dododocs.dododocs.analyze.exception.NoExistRepoAnalyzeException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -11,9 +14,16 @@ import java.util.zip.ZipInputStream;
 @RequiredArgsConstructor
 @Service
 public class DownloadFromS3Service {
+    private final RepoAnalyzeRepository repoAnalyzeRepository;
     private final AmazonS3Client amazonS3Client;
+    private final String bucketName = "haon-dododocs";
 
-    public void downloadAndProcessZip(final String bucketName, final String s3Key) throws IOException {
+    public void downloadAndProcessZip(final String repoName) throws IOException {
+        final RepoAnalyze repoAnalyze = repoAnalyzeRepository.findByRepositoryName(repoName)
+                .orElseThrow(() -> new NoExistRepoAnalyzeException("레포지토리 정보가 존재하지 않습니다."));
+
+        final String s3Key = repoAnalyze.getDocsKey();
+
         // 1. S3에서 ZIP 파일 다운로드
         File zipFile = downloadZipFromS3(bucketName, s3Key);
 
