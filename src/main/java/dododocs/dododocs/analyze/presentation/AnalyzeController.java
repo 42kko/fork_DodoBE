@@ -25,7 +25,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 @RestController
-@RequestMapping("/api/download")
+@RequestMapping("/api")
 public class AnalyzeController {
     private final AnalyzeService analyzeService;
 
@@ -36,17 +36,8 @@ public class AnalyzeController {
     @GetMapping("/upload/s3")
     public String uploadGithubToS3(@Authentication final Accessor accessor,
                                    @RequestBody final UploadGitRepoContentToS3Request uploadToS3Request) {
-
         // s3 key 값, 레포 주소 필요
-
-        String owner = "msung99";   // => gitHub 사용자명 또는 조직명
-        String repo = "Gatsby-Starter-Haon";   // => 레포지토리 이름
-        String branch = "main";      // => main
-        String bucketName = "haon-dododocs";
-        String s3Key = "open-source";
-
         try {
-            System.out.println("===========");
             System.out.println(uploadToS3Request.getRepositoryName());
             analyzeService.uploadGithubRepoToS3(accessor.getId(), uploadToS3Request.getRepositoryName(), uploadToS3Request.getBranchName());
             return "GitHub repository successfully uploaded to S3!";
@@ -54,6 +45,11 @@ public class AnalyzeController {
             e.printStackTrace();
             return "Failed to upload GitHub repository to S3: " + e.getMessage();
         }
+    }
+
+    @GetMapping("/download/s3")
+    public void downloadAIAnalyzeResultFromS3(@Authentication final Accessor accessor) {
+        
     }
 }
 
