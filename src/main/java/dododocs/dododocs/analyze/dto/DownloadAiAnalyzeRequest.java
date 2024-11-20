@@ -4,12 +4,12 @@ import lombok.Getter;
 
 @Getter
 public class DownloadAiAnalyzeRequest {
-    private String repoName;
+    private String repositoryName;
 
     private DownloadAiAnalyzeRequest() {
     }
 
-    public DownloadAiAnalyzeRequest(final String repoName) {
-        this.repoName = repoName;
+    public DownloadAiAnalyzeRequest(final String repositoryName) {
+        this.repositoryName = repositoryName;
     }
 }
