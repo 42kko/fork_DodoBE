@@ -20,6 +20,7 @@ public class S3DownloadController {
     @GetMapping("/download/s3")
     public String downloadAIAnalyzeResultFromS3(@Authentication final Accessor accessor,
                                                 @RequestBody final DownloadAiAnalyzeRequest downloadAiAnalyzeRequest) throws Exception {
+        System.out.println(downloadAiAnalyzeRequest.getRepoName());
         s3DownloadService.downloadAndProcessZip(downloadAiAnalyzeRequest.getRepoName());
         return "ZIP 파일 다운로드 및 처리 완료!";
     }

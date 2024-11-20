@@ -60,9 +60,9 @@ public class AnalyzeService {
         String s3Key = ownerName + "-" + repoName;
         String repoUrl = String.format("https://github.com/%s/%s", ownerName, repoName);
 
-        ExternalAiZipAnalyzeResponse externalAiZipAnalyzeResponse =
+        /* ExternalAiZipAnalyzeResponse externalAiZipAnalyzeResponse =
                 externalAiZipAnalyzeClient.requestAiZipDownloadAndAnalyze(new ExternalAiZipAnalyzeRequest
-                        (s3Key, String.format("https://github.com/%s/%s", ownerName, repoName), false));
+                        (s3Key, String.format("https://github.com/%s/%s", ownerName, repoName), false)); */
 
         // 1. readMeS3Key / 2. docsS3Key
 
@@ -73,8 +73,10 @@ public class AnalyzeService {
         // 4. ownerName (ex. msung99)
         repoAnalyzeRepository.save(
                 new RepoAnalyze(repoName,
-                        externalAiZipAnalyzeResponse.getReadMeS3Key(),
-                        externalAiZipAnalyzeResponse.getDocsS3Key(),
+                        "kakao-25_moheng_README.md",
+                        "kakao-25_moheng_DOCS.zip",
+                        // externalAiZipAnalyzeResponse.getReadMeS3Key(),
+                        // externalAiZipAnalyzeResponse.getDocsS3Key(),
                         repoUrl,
                         member)
         );
