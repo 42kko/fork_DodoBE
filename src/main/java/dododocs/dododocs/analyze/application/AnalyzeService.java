@@ -223,14 +223,21 @@ public class AnalyzeService {
 
     // 파일 내용 읽기
     private String readFileContent(File file) throws IOException {
-        StringBuilder content = new StringBuilder();
-        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                content.append(line).append("\n");
+        if (file.getName().endsWith(".png") || file.getName().endsWith(".jpg")) {
+            // 바이너리 파일은 Base64로 인코딩
+            byte[] fileBytes = java.nio.file.Files.readAllBytes(file.toPath());
+            return Base64.getEncoder().encodeToString(fileBytes);
+        } else {
+            // 텍스트 파일은 그대로 읽기
+            StringBuilder content = new StringBuilder();
+            try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+                String line;
+                while ((line = br.readLine()) != null) {
+                    content.append(line).append("\n");
+                }
             }
+            return content.toString();
         }
-        return content.toString();
     }
 
     // 폴더 삭제
