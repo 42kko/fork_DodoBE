@@ -4,6 +4,7 @@ package dododocs.dododocs.analyze.presentation;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dododocs.dododocs.analyze.application.AnalyzeService;
+import dododocs.dododocs.analyze.dto.FindGitRepoContentRequest;
 import dododocs.dododocs.analyze.dto.FindRepoContentResponses;
 import dododocs.dododocs.analyze.dto.RepositoryContentDto;
 import dododocs.dododocs.analyze.dto.UploadGitRepoContentToS3Request;
@@ -52,11 +53,9 @@ public class AnalyzeController {
 
     // 레포지토리 폴더 및 파일 구조 반환
     @GetMapping("/repo/contents")
-    public RepositoryContentDto getRepoContents() throws IOException {
-        String owner = "msung99";
-        String repo = "Gatsby-Starter-Haon";
-        String branch = "main";
-        return analyzeService.getRepositoryContents(owner, repo, branch);
+    public RepositoryContentDto getRepoContents(@Authentication final Accessor accessor,
+                                                @RequestBody final FindGitRepoContentRequest findGitRepoContentRequest) throws IOException {
+        return analyzeService.getRepositoryContents(accessor.getId(), findGitRepoContentRequest.getRepositoryName(), findGitRepoContentRequest.getBranchName());
     }
 }
 

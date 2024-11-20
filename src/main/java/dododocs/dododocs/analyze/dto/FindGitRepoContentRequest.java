@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UploadGitRepoContentToS3Request {
+public class FindGitRepoContentRequest {
     private String repositoryName;
     private String branchName;
 }

@@ -67,9 +67,9 @@ public class AnalyzeService {
         String s3Key = ownerName + "-" + repoName;
         String repoUrl = String.format("https://github.com/%s/%s", ownerName, repoName);
 
-        /* ExternalAiZipAnalyzeResponse externalAiZipAnalyzeResponse =
+        ExternalAiZipAnalyzeResponse externalAiZipAnalyzeResponse =
                 externalAiZipAnalyzeClient.requestAiZipDownloadAndAnalyze(new ExternalAiZipAnalyzeRequest
-                        (s3Key, String.format("https://github.com/%s/%s", ownerName, repoName), false)); */
+                        (s3Key, String.format("https://github.com/%s/%s", ownerName, repoName), false));
 
         // 1. readMeS3Key / 2. docsS3Key
 
@@ -80,10 +80,8 @@ public class AnalyzeService {
         // 4. ownerName (ex. msung99)
         repoAnalyzeRepository.save(
                 new RepoAnalyze(repoName,
-                        "kakao-25_moheng_README.md",
-                        "kakao-25_moheng_DOCS.zip",
-                        // externalAiZipAnalyzeResponse.getReadMeS3Key(),
-                        // externalAiZipAnalyzeResponse.getDocsS3Key(),
+                        externalAiZipAnalyzeResponse.getReadMeS3Key(),
+                        externalAiZipAnalyzeResponse.getDocsS3Key(),
                         repoUrl,
                         member)
         );
@@ -141,26 +139,58 @@ public class AnalyzeService {
 
     private final String GITHUB_API_BASE_URL = "https://api.github.com/repos";
 
-    public RepositoryContentDto getRepositoryContents(String owner, String repo, String branch) throws IOException {
-        // GitHub ZIP 다운로드 URL
-        String zipUrl = String.format("https://github.com/%s/%s/archive/refs/heads/%s.zip", owner, repo, branch);
+    public RepositoryContentDto getRepositoryContents(long memberId, String repo, String branch) throws IOException {
+        final Member member = memberRepository.findById(memberId)
+                .orElseThrow(NoExistMemberException::new);
 
-        // 1. ZIP 파일 다운로드
-        File tempZipFile = File.createTempFile(repo, ".zip");
-        downloadFile(zipUrl, tempZipFile);
+        // 개인 소유자로 먼저 시도
+        String ownerName = member.getOriginName();
+        RepositoryContentDto result = tryGetRepositoryContents(ownerName, repo, branch);
 
-        // 2. ZIP 파일 압축 해제
-        File tempDir = new File(tempZipFile.getParent(), repo);
-        unzip(tempZipFile, tempDir);
+        // 개인 소유에서 찾지 못하면 조직 소유로 검색
+        if (result == null) {
+            List<String> organizationNames = findOrganizationNames(member);
+            for (String orgName : organizationNames) {
+                result = tryGetRepositoryContents(orgName, repo, branch);
+                if (result != null) {
+                    break;
+                }
+            }
+        }
 
-        // 3. 폴더 및 파일 구조 생성
-        RepositoryContentDto root = parseFolder(tempDir);
+        if (result == null) {
+            throw new IllegalArgumentException("Could not find repository " + repo + " under any owner.");
+        }
 
-        // 4. 임시 파일 삭제
-        tempZipFile.delete();
-        deleteFolder(tempDir);
+        return result;
+    }
 
-        return root;
+    // 특정 소유자(개인 또는 조직)에서 레포지토리를 가져오기 시도
+    private RepositoryContentDto tryGetRepositoryContents(String ownerName, String repo, String branch) {
+        try {
+            // GitHub ZIP 다운로드 URL
+            String zipUrl = String.format("https://github.com/%s/%s/archive/refs/heads/%s.zip", ownerName, repo, branch);
+
+            // 1. ZIP 파일 다운로드
+            File tempZipFile = File.createTempFile(repo, ".zip");
+            downloadFile(zipUrl, tempZipFile);
+
+            // 2. ZIP 파일 압축 해제
+            File tempDir = new File(tempZipFile.getParent(), repo);
+            unzip(tempZipFile, tempDir);
+
+            // 3. 폴더 및 파일 구조 생성
+            RepositoryContentDto root = parseFolder(tempDir);
+
+            // 4. 임시 파일 삭제
+            tempZipFile.delete();
+            deleteFolder(tempDir);
+
+            return root;
+        } catch (IOException e) {
+            System.err.println("Failed to retrieve repository for owner: " + ownerName);
+            return null;
+        }
     }
 
     // 파일 다운로드
