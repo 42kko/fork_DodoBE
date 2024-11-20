@@ -13,7 +13,7 @@ import java.util.zip.ZipInputStream;
 public class DownloadFromS3Service {
     private final AmazonS3Client amazonS3Client;
 
-    public void downloadAndProcessZip(String bucketName, String s3Key) throws IOException {
+    public void downloadAndProcessZip(final String bucketName, final String s3Key) throws IOException {
         // 1. S3에서 ZIP 파일 다운로드
         File zipFile = downloadZipFromS3(bucketName, s3Key);
 

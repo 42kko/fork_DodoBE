@@ -1,7 +1,9 @@
 package dododocs.dododocs.analyze.application;
 
 import com.amazonaws.services.s3.AmazonS3Client;
+import dododocs.dododocs.analyze.domain.RepoAnalyze;
 import dododocs.dododocs.analyze.domain.repository.MemberOrganizationRepository;
+import dododocs.dododocs.analyze.domain.repository.RepoAnalyzeRepository;
 import dododocs.dododocs.analyze.dto.ExternalAiZipAnalyzeRequest;
 import dododocs.dododocs.analyze.dto.ExternalAiZipAnalyzeResponse;
 import dododocs.dododocs.analyze.infrastructure.ExternalAiZipAnalyzeClient;
@@ -32,6 +34,7 @@ public class AnalyzeService {
     private final MemberRepository memberRepository;
     private final AmazonS3Client amazonS3Client;
     private final MemberOrganizationRepository memberOrganizationRepository;
+    private final RepoAnalyzeRepository repoAnalyzeRepository;
 
     // GitHub 레포지토리를 ZIP 파일로 가져와 S3에 업로드
     public void uploadGithubRepoToS3(final long memberId, String repoName, String branchName) {
@@ -55,8 +58,11 @@ public class AnalyzeService {
         }
 
         String s3Key = ownerName + "-" + repoName;
+        String repoUrl = String.format("https://github.com/%s/%s", ownerName, repoName);
+
         ExternalAiZipAnalyzeResponse externalAiZipAnalyzeResponse =
-                externalAiZipAnalyzeClient.requestAiZipDownloadAndAnalyze(new ExternalAiZipAnalyzeRequest(s3Key, repoName, false));
+                externalAiZipAnalyzeClient.requestAiZipDownloadAndAnalyze(new ExternalAiZipAnalyzeRequest
+                        (s3Key, String.format("https://github.com/%s/%s", ownerName, repoName), false));
 
         // 1. readMeS3Key / 2. docsS3Key
 
@@ -65,6 +71,13 @@ public class AnalyzeService {
         // 2. docsS3key (AI 가 만들어준 s3 내의 레포 분석 결과인 ZIP 파일이 어디있는지)
         // 3. repositoryName (ex. Gatsby-Starter-Haon)
         // 4. ownerName (ex. msung99)
+        repoAnalyzeRepository.save(
+                new RepoAnalyze(repoName,
+                        externalAiZipAnalyzeResponse.getReadMeS3Key(),
+                        externalAiZipAnalyzeResponse.getDocsS3Key(),
+                        repoUrl,
+                        member)
+        );
     }
 
     // 특정 소유자(개인 또는 조직)에서 레포지토리를 찾아 업로드 시도
@@ -72,6 +85,7 @@ public class AnalyzeService {
         try {
             String bucketDetailName = ownerName + "-" + repoName;
             String downloadUrl = String.format("https://github.com/%s/%s/archive/refs/heads/%s.zip", ownerName, repoName, branchName);
+            System.out.println("Attempting to download from GitHub URL: " + downloadUrl);
 
             // ZIP 파일을 임시 디렉토리에 저장
             File tempFile = File.createTempFile(repoName, ".zip");
