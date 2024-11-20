@@ -4,6 +4,8 @@ package dododocs.dododocs.analyze.presentation;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dododocs.dododocs.analyze.application.AnalyzeService;
+import dododocs.dododocs.analyze.dto.FindRepoContentResponses;
+import dododocs.dododocs.analyze.dto.RepositoryContentDto;
 import dododocs.dododocs.analyze.dto.UploadGitRepoContentToS3Request;
 import dododocs.dododocs.auth.dto.Accessor;
 import dododocs.dododocs.auth.presentation.authentication.Authentication;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.List;
@@ -45,6 +48,15 @@ public class AnalyzeController {
             e.printStackTrace();
             return "Failed to upload GitHub repository to S3: " + e.getMessage();
         }
+    }
+
+    // 레포지토리 폴더 및 파일 구조 반환
+    @GetMapping("/repo/contents")
+    public RepositoryContentDto getRepoContents() throws IOException {
+        String owner = "msung99";
+        String repo = "Gatsby-Starter-Haon";
+        String branch = "main";
+        return analyzeService.getRepositoryContents(owner, repo, branch);
     }
 }
 
