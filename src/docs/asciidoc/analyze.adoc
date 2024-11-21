@@ -1,0 +1,52 @@
+== ⛳️ AI 문서화
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 2
+
+=== 깃허브 레포지토리 실제 코드 조회 요청
+
+include::{snippets}/find/repo/content/success/http-request.adoc[]
+
+==== Request Body
+
+include::{snippets}/find/repo/content/success/request-fields.adoc[]
+
+==== HTTP Response
+
+include::{snippets}/find/repo/content/success/http-response.adoc[]
+
+=== AI 분석 및 문서화 요청
+
+include::{snippets}/analyze/upload/success/http-request.adoc[]
+
+==== HTTP Request
+
+include::{snippets}/analyze/upload/success/http-request.adoc[]
+
+==== Request Body
+
+include::{snippets}/analyze/upload/success/request-fields.adoc[]
+
+=== HTTP Response
+
+include::{snippets}/analyze/upload/success/http-response.adoc[]
+
+=== AI 분석 및 문서화 결과 불러오기
+
+==== HTTP Request
+
+include::{snippets}/analyze/download/success/http-request.adoc[]
+
+==== Request Body
+
+include::{snippets}/analyze/download/success/request-fields.adoc[]
+
+==== HTTP Response
+
+include::{snippets}/analyze/download/success/http-response.adoc[]
+
+===== Response Body
+
+include::{snippets}/analyze/download/success/response-fields.adoc[]

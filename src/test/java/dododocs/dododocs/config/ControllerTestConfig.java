@@ -2,6 +2,9 @@ package dododocs.dododocs.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dododocs.dododocs.analyze.application.AnalyzeService;
+import dododocs.dododocs.analyze.application.DownloadFromS3Service;
+import dododocs.dododocs.analyze.presentation.AnalyzeController;
+import dododocs.dododocs.analyze.presentation.S3DownloadController;
 import dododocs.dododocs.auth.application.AuthService;
 import dododocs.dododocs.auth.domain.GithubOAuthUriProvider;
 import dododocs.dododocs.auth.domain.JwtTokenCreator;
@@ -25,6 +28,8 @@ import org.springframework.test.web.servlet.MockMvc;
 @WebMvcTest({
         AuthController.class,
         MemberController.class,
+        S3DownloadController.class,
+        AnalyzeController.class,
 })
 @Import(TestConfig.class)
 @ActiveProfiles("test")
@@ -52,4 +57,10 @@ public abstract class ControllerTestConfig {
 
     @MockBean
     protected GithubOAuthUriProvider githubOAuthUriProvider;
+
+    @MockBean
+    protected AnalyzeService analyzeService;
+
+    @MockBean
+    protected DownloadFromS3Service downloadFromS3Service;
 }

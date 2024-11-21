@@ -37,18 +37,11 @@ public class AnalyzeController {
         this.analyzeService = analyzeService;
     }
 
-    @GetMapping("/upload/s3")
-    public String uploadGithubToS3(@Authentication final Accessor accessor,
+    @PostMapping("/upload/s3")
+    public void uploadGithubToS3(@Authentication final Accessor accessor,
                                    @RequestBody final UploadGitRepoContentToS3Request uploadToS3Request) {
         // s3 key 값, 레포 주소 필요
-        try {
-            System.out.println(uploadToS3Request.getRepositoryName());
-            analyzeService.uploadGithubRepoToS3(accessor.getId(), uploadToS3Request.getRepositoryName(), uploadToS3Request.getBranchName());
-            return "GitHub repository successfully uploaded to S3!";
-        } catch (Exception e) {
-            e.printStackTrace();
-            return "Failed to upload GitHub repository to S3: " + e.getMessage();
-        }
+        analyzeService.uploadGithubRepoToS3(accessor.getId(), uploadToS3Request.getRepositoryName(), uploadToS3Request.getBranchName());
     }
 
     // 레포지토리 폴더 및 파일 구조 반환

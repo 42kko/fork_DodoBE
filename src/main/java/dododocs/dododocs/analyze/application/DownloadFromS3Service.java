@@ -48,21 +48,25 @@ public class DownloadFromS3Service {
     private File downloadZipFromS3(String bucketName, String s3Key) throws IOException {
         File tempZipFile = File.createTempFile("s3-download", ".zip");
 
-        try (InputStream inputStream = amazonS3Client.getObject(bucketName, s3Key).getObjectContent();
-             FileOutputStream outputStream = new FileOutputStream(tempZipFile)) {
+        InputStream inputStream = null;
 
-            byte[] buffer = new byte[8192];
-            int bytesRead;
-            while ((bytesRead = inputStream.read(buffer)) != -1) {
-                outputStream.write(buffer, 0, bytesRead);
-            }
+        try {
+            inputStream = amazonS3Client.getObject(bucketName, s3Key).getObjectContent();
+        } catch (Exception e) {
+            throw new NoExistRepoAnalyzeException("레포지토리 결과물을 아직 생성중입니다. 잠시만 기다려주세요.");
+        }
+        FileOutputStream outputStream = new FileOutputStream(tempZipFile);
+
+        byte[] buffer = new byte[8192];int bytesRead;
+        while ((bytesRead = inputStream.read(buffer)) != -1) {
+            outputStream.write(buffer, 0, bytesRead);
         }
 
         return tempZipFile;
     }
 
     private File unzipFile(File zipFile) throws IOException {
-        File outputDir = new File(zipFile.getParent(), "extracted");
+        File outputDir = new File(zipFile.getParent(), "extacted");
         if (!outputDir.exists()) {
             outputDir.mkdirs();
         }
