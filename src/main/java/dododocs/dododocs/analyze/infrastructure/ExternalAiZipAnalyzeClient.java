@@ -16,7 +16,7 @@ import java.util.Map;
 @Component
 public class ExternalAiZipAnalyzeClient {
     private final String aiBasicUrl;
-    private final String AI_ZIP_DOWNLOAD_AND_ANALYZE_REQUEST_URL_PREFIX = "travel/custom/model?page={page}";
+    private final String AI_ZIP_DOWNLOAD_AND_ANALYZE_REQUEST_URL_PREFIX = "/generate";
     private final RestTemplate restTemplate;
 
     public ExternalAiZipAnalyzeClient(final RestTemplate restTemplate,
