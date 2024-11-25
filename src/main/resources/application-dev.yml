@@ -49,5 +49,7 @@ cloud:
       accessKey: ${AWS_CREDEZNTIALS_ACCESSKEY}
       secretKey: ${AWS_CREDEZNTIALS_SECRETKEY}
 
+ai:
+  basic_url: ${AI_BASIC_URL}
 
 
