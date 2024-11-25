@@ -5,6 +5,7 @@ import dododocs.dododocs.member.domain.Member;
 import dododocs.dododocs.test.dto.CreateMemberRequest;
 import dododocs.dododocs.test.dto.FindDbTestResponse;
 import dododocs.dododocs.test.dto.FindTrueTestResponse;
+import dododocs.dododocs.test.infrastructure.ExternalAiTestClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,10 +15,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api")
 @RestController
 public class ApiTestController {
+    private final ExternalAiTestClient externalAiTestClient;
     private final MemberRepository memberRepository;
 
-    public ApiTestController(final MemberRepository memberRepository) {
+    public ApiTestController(final MemberRepository memberRepository,
+                             final ExternalAiTestClient externalAiTestClient) {
         this.memberRepository = memberRepository;
+        this.externalAiTestClient = externalAiTestClient;
     }
 
     @GetMapping("/server")
@@ -41,5 +45,10 @@ public class ApiTestController {
     @GetMapping("/dbfind")
     public ResponseEntity<Member> findMember() {
         return ResponseEntity.ok(memberRepository.findById(1L).orElse(null));
+    }
+
+    @GetMapping("/ping")
+    public ResponseEntity<String> ping() {
+        return ResponseEntity.ok(externalAiTestClient.requestTestAI());
     }
 }
