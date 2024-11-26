@@ -18,6 +18,8 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
+import java.net.InetSocketAddress;
+import java.net.Proxy;
 import java.net.URL;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
@@ -99,7 +101,7 @@ public class AnalyzeService {
             tempFile = File.createTempFile(repoName, ".zip");
             downloadFileFromUrl(downloadUrl, tempFile);
         } catch (Exception e) {
-            System.out.println("깃허브 레포지토리 다운로드 받다가 오류저짐");
+            System.out.println("깃허브 레포지토리 다운로드 받다가 오류터짐");
             System.out.println("===================");
             System.out.println(e.getMessage());
             System.out.println("===================");
@@ -124,7 +126,18 @@ public class AnalyzeService {
     // URL에서 파일 다운로드
     private void downloadFileFromUrl(String downloadUrl, File destinationFile) throws IOException {
         URL url = new URL(downloadUrl);
-        URLConnection connection = url.openConnection();
+
+        URLConnection connection;
+        String activeProfile = System.getProperty("spring.profiles.active", "default");
+
+        // dev 또는 prod 프로파일에만 프록시 설정
+        if ("dev".equals(activeProfile) || "prod".equals(activeProfile)) {
+            Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("krmp-proxy.9rum.cc", 3128));
+            connection = url.openConnection(proxy);
+        } else {
+            connection = url.openConnection(); // 프록시 없이 직접 연결
+        }
+
         try (InputStream inputStream = connection.getInputStream();
              OutputStream outputStream = new FileOutputStream(destinationFile)) {
 
@@ -136,12 +149,11 @@ public class AnalyzeService {
         }
     }
 
+
     // 특정 멤버의 조직 이름 리스트 반환
     private List<String> findOrganizationNames(final Member member) {
         return memberOrganizationRepository.findOrganizationNamesByMember(member);
     }
-
-
 
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
