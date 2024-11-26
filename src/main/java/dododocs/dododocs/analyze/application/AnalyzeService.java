@@ -89,27 +89,36 @@ public class AnalyzeService {
 
     // 특정 소유자(개인 또는 조직)에서 레포지토리를 찾아 업로드 시도
     private boolean tryUploadFromOwner(String ownerName, String repoName, String branchName) {
+        String bucketDetailName = ownerName + "-" + repoName;
+        String downloadUrl = String.format("https://github.com/%s/%s/archive/refs/heads/%s.zip", ownerName, repoName, branchName);
+        System.out.println("Attempting to download from GitHub URL: " + downloadUrl);
+
+        // ZIP 파일을 임시 디렉토리에 저장
+        File tempFile = null;
         try {
-            String bucketDetailName = ownerName + "-" + repoName;
-            String downloadUrl = String.format("https://github.com/%s/%s/archive/refs/heads/%s.zip", ownerName, repoName, branchName);
-            System.out.println("Attempting to download from GitHub URL: " + downloadUrl);
-
-            // ZIP 파일을 임시 디렉토리에 저장
-            File tempFile = File.createTempFile(repoName, ".zip");
+            tempFile = File.createTempFile(repoName, ".zip");
             downloadFileFromUrl(downloadUrl, tempFile);
-
-            // S3에 업로드
-            amazonS3Client.putObject("haon-dododocs", bucketDetailName, tempFile);
-
-            // 업로드 후 임시 파일 삭제
-            tempFile.delete();
-            return true;
-        } catch (IOException e) {
-            // 레포지토리를 찾지 못하거나 다운로드 실패 시 false 반환
-            System.err.println("Failed to upload repository from owner: " + ownerName);
-            e.printStackTrace();
-            return false;
+        } catch (Exception e) {
+            System.out.println("깃허브 레포지토리 다운로드 받다가 오류저짐");
+            System.out.println("===================");
+            System.out.println(e.getMessage());
+            System.out.println("===================");
+            System.out.println(e.getCause());
         }
+        // S3에 업로드
+        try {
+            amazonS3Client.putObject("haon-dododocs", bucketDetailName, tempFile);
+        } catch (Exception e) {
+            System.out.println("s3 에 업로드하다가 애러터짐");
+            System.out.println("===================");
+            System.out.println(e.getMessage());
+            System.out.println("===================");
+            System.out.println(e.getCause());
+        }
+
+        // 업로드 후 임시 파일 삭제
+        tempFile.delete();
+        return true;
     }
 
     // URL에서 파일 다운로드
