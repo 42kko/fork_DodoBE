@@ -15,10 +15,6 @@ jobs:
 
     - name: Grant execute permission to gradlew
       run: chmod +x ./gradlew
-
-    - name: Create .env file from GitHub Secrets
-      run: |
-        echo "${{ secrets.ENV_FILE }}" > .env
     
     - name: Extract commit hash
       id: vars
