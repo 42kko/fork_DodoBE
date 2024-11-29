@@ -1,0 +1,21 @@
+== ⛳️ Test (테스트 API)
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 2
+
+=== AI README 분석 결과 조회
+
+==== HTTP Request
+
+include::{snippets}/test/analyze/result/success/http-request.adoc[]
+
+==== Request Body
+
+include::{snippets}/test/analyze/result/success/request-body.adoc[]
+
+==== HTTP Response
+
+include::{snippets}/test/analyze/result/success/http-response.adoc[]
+

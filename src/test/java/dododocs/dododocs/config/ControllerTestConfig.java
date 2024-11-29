@@ -9,12 +9,15 @@ import dododocs.dododocs.auth.application.AuthService;
 import dododocs.dododocs.auth.domain.GithubOAuthUriProvider;
 import dododocs.dododocs.auth.domain.JwtTokenCreator;
 import dododocs.dododocs.auth.domain.JwtTokenProvider;
+import dododocs.dododocs.auth.domain.repository.MemberRepository;
 import dododocs.dododocs.auth.infrastructure.GithubOAuthClient;
 import dododocs.dododocs.auth.presentation.AuthController;
 import dododocs.dododocs.auth.presentation.authentication.AuthenticationBearerExtractor;
 import dododocs.dododocs.global.config.S3Config;
 import dododocs.dododocs.member.application.MemberService;
 import dododocs.dododocs.member.presentation.MemberController;
+import dododocs.dododocs.test.ApiTestController;
+import dododocs.dododocs.test.infrastructure.ExternalAiTestClient;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
@@ -30,6 +33,7 @@ import org.springframework.test.web.servlet.MockMvc;
         MemberController.class,
         S3DownloadController.class,
         AnalyzeController.class,
+        ApiTestController.class
 })
 @Import(TestConfig.class)
 @ActiveProfiles("test")
@@ -63,4 +67,10 @@ public abstract class ControllerTestConfig {
 
     @MockBean
     protected DownloadFromS3Service downloadFromS3Service;
+
+    @MockBean
+    protected ExternalAiTestClient externalAiTestClient;
+
+    @MockBean
+    protected MemberRepository memberRepository;
 }
