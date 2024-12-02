@@ -29,7 +29,7 @@ include::{snippets}/analyze/upload/success/http-request.adoc[]
 
 include::{snippets}/analyze/upload/success/request-fields.adoc[]
 
-=== HTTP Response
+==== HTTP Response
 
 include::{snippets}/analyze/upload/success/http-response.adoc[]
 
@@ -50,3 +50,40 @@ include::{snippets}/analyze/download/success/http-response.adoc[]
 ===== Response Body
 
 include::{snippets}/analyze/download/success/response-fields.adoc[]
+
+=== 등록된 레포지토리 리스트 조회
+
+==== HTTP Request
+
+include::{snippets}/register/find/success/http-request.adoc[]
+
+==== Request Header
+
+include::{snippets}/register/find/success/request-headers.adoc[]
+
+==== HTTP Response
+
+include::{snippets}/register/find/success/http-response.adoc[]
+
+==== Response Body
+
+include::{snippets}/register/find/success/response-fields.adoc[]
+
+
+=== 등록된 레포지토리 삭제
+
+==== HTTP Request
+
+include::{snippets}/register/delete/success/http-request.adoc[]
+
+===== Request Header
+
+include::{snippets}/register/delete/success/request-headers.adoc[]
+
+===== Request Body
+
+include::{snippets}/register/delete/success/request-fields.adoc[]
+
+==== HTTP Response
+
+include::{snippets}/register/delete/success/http-response.adoc[]

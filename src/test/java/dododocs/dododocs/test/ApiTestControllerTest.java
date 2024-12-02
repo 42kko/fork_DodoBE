@@ -14,8 +14,7 @@ import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
-import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
-import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
+import static org.springframework.restdocs.request.RequestDocumentation.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -33,15 +32,14 @@ public class ApiTestControllerTest extends ControllerTestConfig {
     @Test
     void analyzeResultTest_정상_응답_200() throws Exception {
         mockMvc.perform(get("/api/analyze/result")
-                        .accept(MediaType.APPLICATION_JSON)
-                        .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(new DownloadAiAnalyzeRequest("Gatsby-Starter-Haon"))))
+                        .param("repositoryName", "Gatsby-Starter-Haon")
+                        .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andDo(document("test/analyze/result/success",
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
-                        requestFields(
-                                fieldWithPath("repositoryName").type(JsonFieldType.STRING).description("레포명")
+                        queryParameters(
+                                parameterWithName("repositoryName").description("레포명")
                         ),
                         responseFields(
                                 fieldWithPath("summaryFiles").type(JsonFieldType.ARRAY).description("요약 파일 목록"),
@@ -50,5 +48,6 @@ public class ApiTestControllerTest extends ControllerTestConfig {
                                 fieldWithPath("regularFiles[].*").type(JsonFieldType.STRING).description("일반 파일의 이름과 내용")
                         )
                 ));
+
     }
 }

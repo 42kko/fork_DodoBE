@@ -6,10 +6,8 @@ import dododocs.dododocs.analyze.dto.FindRepoRegisterResponses;
 import dododocs.dododocs.auth.dto.Accessor;
 import dododocs.dododocs.auth.presentation.authentication.Authentication;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/register")
@@ -23,8 +21,9 @@ public class RepoRegisterController {
     }
 
     @DeleteMapping
-    public void deleteRegisteredRepos(@Authentication final Accessor accessor,
-                                      final DeleteRepoRegisterRequest deleteRepoRegisterRequest) {
+    public ResponseEntity<Void> deleteRegisteredRepos(@Authentication final Accessor accessor,
+                                                final @RequestBody DeleteRepoRegisterRequest deleteRepoRegisterRequest) {
         repoRegisterService.removeRegisteredRepos(deleteRepoRegisterRequest.getRegisteredRepoId());
+        return ResponseEntity.noContent().build();
     }
 }

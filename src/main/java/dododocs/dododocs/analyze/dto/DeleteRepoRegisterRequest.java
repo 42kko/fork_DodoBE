@@ -4,7 +4,10 @@ import lombok.Getter;
 
 @Getter
 public class DeleteRepoRegisterRequest {
-    private final long registeredRepoId;
+    private long registeredRepoId;
+
+    private DeleteRepoRegisterRequest() {
+    }
 
     public DeleteRepoRegisterRequest(final long registeredRepoId) {
         this.registeredRepoId = registeredRepoId;

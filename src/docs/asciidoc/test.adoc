@@ -11,10 +11,6 @@
 
 include::{snippets}/test/analyze/result/success/http-request.adoc[]
 
-==== Request Body
-
-include::{snippets}/test/analyze/result/success/request-body.adoc[]
-
 ==== HTTP Response
 
 include::{snippets}/test/analyze/result/success/http-response.adoc[]

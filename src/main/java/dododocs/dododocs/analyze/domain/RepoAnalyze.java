@@ -38,4 +38,9 @@ public class RepoAnalyze {
         this.repoUrl = repoUrl;
         this.member = member;
     }
+
+    public RepoAnalyze(final long id, final String repositoryName) {
+        this.id = id;
+        this.repositoryName = repositoryName;
+    }
 }

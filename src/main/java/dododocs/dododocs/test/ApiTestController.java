@@ -55,7 +55,7 @@ public class ApiTestController {
     }
 
     @GetMapping("/analyze/result")
-    public ResponseEntity<DownloadAiAnalyzeResponse> analyzeResultTest(@RequestBody final DownloadAiAnalyzeRequest request) {
+    public ResponseEntity<DownloadAiAnalyzeResponse> analyzeResultTest(@RequestParam final String repositoryName) {
         List<Map<String, String>> summaryFiles = List.of(
                 Map.of("Controller_summary.md", """
             # Controller Files Summary
@@ -160,5 +160,4 @@ public class ApiTestController {
 
         return ResponseEntity.ok(new DownloadAiAnalyzeResponse(summaryFiles, regularFiles));
     }
-
 }

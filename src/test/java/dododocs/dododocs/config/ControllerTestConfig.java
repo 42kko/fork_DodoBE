@@ -3,7 +3,9 @@ package dododocs.dododocs.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dododocs.dododocs.analyze.application.AnalyzeService;
 import dododocs.dododocs.analyze.application.DownloadFromS3Service;
+import dododocs.dododocs.analyze.application.RepoRegisterService;
 import dododocs.dododocs.analyze.presentation.AnalyzeController;
+import dododocs.dododocs.analyze.presentation.RepoRegisterController;
 import dododocs.dododocs.analyze.presentation.S3DownloadController;
 import dododocs.dododocs.auth.application.AuthService;
 import dododocs.dododocs.auth.domain.GithubOAuthUriProvider;
@@ -33,7 +35,8 @@ import org.springframework.test.web.servlet.MockMvc;
         MemberController.class,
         S3DownloadController.class,
         AnalyzeController.class,
-        ApiTestController.class
+        ApiTestController.class,
+        RepoRegisterController.class,
 })
 @Import(TestConfig.class)
 @ActiveProfiles("test")
@@ -73,4 +76,7 @@ public abstract class ControllerTestConfig {
 
     @MockBean
     protected MemberRepository memberRepository;
+
+    @MockBean
+    protected RepoRegisterService repoRegisterService;
 }
