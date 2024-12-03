@@ -41,7 +41,7 @@ public class AnalyzeController {
     public void uploadGithubToS3(@Authentication final Accessor accessor,
                                    @RequestBody final UploadGitRepoContentToS3Request uploadToS3Request) {
         // s3 key 값, 레포 주소 필요
-        analyzeService.uploadGithubRepoToS3(accessor.getId(), uploadToS3Request.getRepositoryName(), uploadToS3Request.getBranchName());
+        analyzeService.uploadGithubRepoToS3(uploadToS3Request, accessor.getId());
     }
 
     // 레포지토리 폴더 및 파일 구조 반환

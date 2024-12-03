@@ -8,6 +8,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;
 
+import java.util.List;
+
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
@@ -27,20 +29,34 @@ public class AnalyzeControllerTest extends ControllerTestConfig {
     void AI_레포지토리_분석_결과를_요청하고_상태코드_200을_리턴한다() throws Exception {
         // given
         given(jwtTokenCreator.extractMemberId(anyString())).willReturn(1L);
-        doNothing().when(analyzeService).uploadGithubRepoToS3(anyLong(), anyString(), anyString());
+        doNothing().when(analyzeService).uploadGithubRepoToS3(any(), anyLong());
 
         // when, then
         mockMvc.perform(post("/api/upload/s3")
                         .header("Authorization", "Bearer aaaaaa.bbbbbb.cccccc")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(new UploadGitRepoContentToS3Request("Gatsby-Starter-Haon", "main"))))
+                        .content(objectMapper.writeValueAsString(new UploadGitRepoContentToS3Request("Gatsby-Starter-Haon", "main", true,
+                                List.of(
+                                        "PREVIEW_BLOCK",
+                                        "ANALYSIS_BLOCK",
+                                        "STRUCTURE_BLOCK",
+                                        "START_BLOCK",
+                                        "MOTIVATION_BLOCK",
+                                        "DEMO_BLOCK",
+                                        "DEPLOYMENT_BLOCK",
+                                        "CONTRIBUTORS_BLOCK",
+                                        "FAQ_BLOCK",
+                                        "PERFORMANCE_BLOCK"
+                                )))))
                 .andDo(print())
                 .andDo(document("analyze/upload/success",
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
                         requestFields(
                                 fieldWithPath("repositoryName").type(JsonFieldType.STRING).description("분석 할 레포지토리 이름 (ex. Gatsby-Starter-Haon)"),
-                                fieldWithPath("branchName").type(JsonFieldType.STRING).description("브랜치 명 (ex. main)")
+                                fieldWithPath("branchName").type(JsonFieldType.STRING).description("브랜치 명 (ex. main)"),
+                                fieldWithPath("korean").type(JsonFieldType.BOOLEAN).description("한국어 번역 여부"),
+                                fieldWithPath("readmeBlocks").description("리드미 템플릿 생성 옵션. PREVIEW_BLOCK, ANALYSIS_BLOCK, STRUCTURE_BLOCK, START_BLOCK, MOTIVATION_BLOCK, DEMO_BLOCK, DEPLOYMENT_BLOCK, CONTRIBUTORS_BLOCK, FAQ_BLOCK, PERFORMANCE_BLOCK")
                 )))
                 .andExpect(status().isOk());
     }
@@ -50,7 +66,7 @@ public class AnalyzeControllerTest extends ControllerTestConfig {
     void 레포지토리의_모든_코드를_읽어오고_상태코드_200을_리턴한다() throws Exception{
         // given
         given(jwtTokenCreator.extractMemberId(anyString())).willReturn(1L);
-        doNothing().when(analyzeService).uploadGithubRepoToS3(anyLong(), anyString(), anyString());
+        doNothing().when(analyzeService).uploadGithubRepoToS3(any(), anyLong());
 
         // when, then
         mockMvc.perform(get("/api/repo/contents")

@@ -9,6 +9,7 @@ import dododocs.dododocs.analyze.domain.repository.RepoAnalyzeRepository;
 import dododocs.dododocs.analyze.dto.ExternalAiZipAnalyzeRequest;
 import dododocs.dododocs.analyze.dto.ExternalAiZipAnalyzeResponse;
 import dododocs.dododocs.analyze.dto.RepositoryContentDto;
+import dododocs.dododocs.analyze.dto.UploadGitRepoContentToS3Request;
 import dododocs.dododocs.analyze.infrastructure.ExternalAiZipAnalyzeClient;
 import dododocs.dododocs.auth.domain.repository.MemberRepository;
 import dododocs.dododocs.auth.exception.NoExistMemberException;
@@ -46,7 +47,11 @@ public class AnalyzeService {
     private final RepoAnalyzeRepository repoAnalyzeRepository;
 
     // GitHub 레포지토리를 ZIP 파일로 가져와 S3에 업로드
-    public void uploadGithubRepoToS3(final long memberId, String repoName, String branchName) {
+    public void uploadGithubRepoToS3(final UploadGitRepoContentToS3Request uploadGitRepoContentToS3Request, final long memberId) {
+        final String repoName = uploadGitRepoContentToS3Request.getRepositoryName();
+        final String branchName = uploadGitRepoContentToS3Request.getBranchName();
+        final List<String> readmeBlocks = uploadGitRepoContentToS3Request.getReadmeBlocks();
+
         // Member를 조회
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(NoExistMemberException::new);
@@ -71,7 +76,7 @@ public class AnalyzeService {
 
         ExternalAiZipAnalyzeResponse externalAiZipAnalyzeResponse =
                 externalAiZipAnalyzeClient.requestAiZipDownloadAndAnalyze(new ExternalAiZipAnalyzeRequest
-                        (s3Key, String.format("https://github.com/%s/%s", ownerName, repoName), false));
+                        (s3Key, String.format("https://github.com/%s/%s", ownerName, repoName), readmeBlocks, false, uploadGitRepoContentToS3Request.isKorean()));
 
         // 1. readMeS3Key / 2. docsS3Key
 
@@ -90,6 +95,49 @@ public class AnalyzeService {
                         member)
         );
     }
+
+    /*
+        List<String> readmeBlocks = new ArrayList<>();
+
+        if(uploadGitRepoContentToS3Request.isPreviewBlock()) {
+            readmeBlocks.add("PREVIEW_BLOCK");
+        }
+
+        if(uploadGitRepoContentToS3Request.isAnalysisBlock()) {
+            readmeBlocks.add("ANALYSIS_BLOCK");
+        }
+
+        if(uploadGitRepoContentToS3Request.isStructureBlock()) {
+            readmeBlocks.add("STRUCTURE_BLOCK");
+        }
+
+        if(uploadGitRepoContentToS3Request.isStartBlock()) {
+            readmeBlocks.add("START_BLOCK");
+        }
+
+        if(uploadGitRepoContentToS3Request.isMotivationBlock()) {
+            readmeBlocks.add("MOTIVATION_BLOCK");
+        }
+
+        if(uploadGitRepoContentToS3Request.isDemoBlock()) {
+            readmeBlocks.add("DEMO_BLOCK");
+        }
+
+        if(uploadGitRepoContentToS3Request.isDeploymentBlock()) {
+            readmeBlocks.add("DEPLOYMENT_BLOCK");
+        }
+
+        if(uploadGitRepoContentToS3Request.isContributorsBlock()) {
+            readmeBlocks.add("CONTRIBUTORS_BLOCK");
+        }
+
+        if(uploadGitRepoContentToS3Request.isFaqBlock()) {
+            readmeBlocks.add("FAQ_BLOCK");
+        }
+
+        if(uploadGitRepoContentToS3Request.isPerformanceBlock()) {
+            readmeBlocks.add("PERFORMANCE_BLOCK");
+        } */
 
     // 특정 소유자(개인 또는 조직)에서 레포지토리를 찾아 업로드 시도
     private boolean tryUploadFromOwner(String ownerName, String repoName, String branchName) {
