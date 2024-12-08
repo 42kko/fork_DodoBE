@@ -26,3 +26,22 @@ include::{snippets}/member/repos/http-response.adoc[]
 ===== Response Body
 
 include::{snippets}/member/repos/response-fields.adoc[]
+
+
+=== 멤버가 등록한 레포지토리 리스트 조회
+
+==== HTTP Request
+
+include::{snippets}/repos/registered/find/success/http-request.adoc[]
+
+==== Request Header
+
+include::{snippets}/repos/registered/find/success/request-headers.adoc[]
+
+==== HTTP Response
+
+include::{snippets}/repos/registered/find/success/http-response.adoc[]
+
+==== Response Field
+
+include::{snippets}/repos/registered/find/success/response-fields.adoc[]

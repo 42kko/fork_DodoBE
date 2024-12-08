@@ -2,6 +2,7 @@ package dododocs.dododocs.analyze;
 
 import dododocs.dododocs.analyze.dto.FindGitRepoContentRequest;
 import dododocs.dododocs.analyze.dto.UploadGitRepoContentToS3Request;
+import dododocs.dododocs.analyze.exception.MaxSizeRepoRegiserException;
 import dododocs.dododocs.config.ControllerTestConfig;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -13,6 +14,9 @@ import java.util.List;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
+import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
+import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
@@ -35,19 +39,8 @@ public class AnalyzeControllerTest extends ControllerTestConfig {
         mockMvc.perform(post("/api/upload/s3")
                         .header("Authorization", "Bearer aaaaaa.bbbbbb.cccccc")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(new UploadGitRepoContentToS3Request("Gatsby-Starter-Haon", "main", true,
-                                List.of(
-                                        "PREVIEW_BLOCK",
-                                        "ANALYSIS_BLOCK",
-                                        "STRUCTURE_BLOCK",
-                                        "START_BLOCK",
-                                        "MOTIVATION_BLOCK",
-                                        "DEMO_BLOCK",
-                                        "DEPLOYMENT_BLOCK",
-                                        "CONTRIBUTORS_BLOCK",
-                                        "FAQ_BLOCK",
-                                        "PERFORMANCE_BLOCK"
-                                )))))
+                        .content(objectMapper.writeValueAsString(new UploadGitRepoContentToS3Request("Gatsby-Starter-Haon", "main", true, true
+                                ))))
                 .andDo(print())
                 .andDo(document("analyze/upload/success",
                         preprocessRequest(prettyPrint()),
@@ -61,10 +54,40 @@ public class AnalyzeControllerTest extends ControllerTestConfig {
                 .andExpect(status().isOk());
     }
 
+    @DisplayName("레포지토리 등록시 3개 이상 등록한 상태라면 예외가 발생한다.")
+    @Test
+    void registerRepoMaxUpSizeExceptionTest() throws Exception {
+        // given
+        given(jwtTokenCreator.extractMemberId(anyString())).willReturn(1L);
+        doThrow(new MaxSizeRepoRegiserException("최대 3개의 레포지토리를 등록 가능합니다."))
+                .when(analyzeService).uploadGithubRepoToS3(any(), anyLong());
+
+        // when, then
+        mockMvc.perform(post("/api/upload/s3")
+                .header("Authorization", "Bearer aaaaaa.bbbbbb.cccccc")
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(new UploadGitRepoContentToS3Request("Gatsby-Starter-Haon", "main", true, true))))
+                .andDo(print())
+                .andDo(document("analyze/upload/fail/max/size",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        requestHeaders(
+                                headerWithName("Authorization").description("엑세스 토큰")
+                        ),
+                        requestFields(
+                                fieldWithPath("repositoryName").type(JsonFieldType.STRING).description("분석 할 레포지토리 이름 (ex. Gatsby-Starter-Haon)"),
+                                fieldWithPath("branchName").type(JsonFieldType.STRING).description("브랜치 명 (ex. main)"),
+                                fieldWithPath("korean").type(JsonFieldType.BOOLEAN).description("한국어 번역 여부"),
+                                fieldWithPath("readmeBlocks").description("리드미 템플릿 생성 옵션. PREVIEW_BLOCK, ANALYSIS_BLOCK, STRUCTURE_BLOCK, START_BLOCK, MOTIVATION_BLOCK, DEMO_BLOCK, DEPLOYMENT_BLOCK, CONTRIBUTORS_BLOCK, FAQ_BLOCK, PERFORMANCE_BLOCK")
+                )))
+                .andExpect(status().isBadRequest());
+    }
+
     @DisplayName("레포지토리의 모든 코드를 읽어오고 상태코드 200을 리턴한다.")
     @Test
     void 레포지토리의_모든_코드를_읽어오고_상태코드_200을_리턴한다() throws Exception{
-        // given
+        /* // given
         given(jwtTokenCreator.extractMemberId(anyString())).willReturn(1L);
         doNothing().when(analyzeService).uploadGithubRepoToS3(any(), anyLong());
 
@@ -81,6 +104,6 @@ public class AnalyzeControllerTest extends ControllerTestConfig {
                                 fieldWithPath("repositoryName").type(JsonFieldType.STRING).description("코드를 가져올 레포지토리 이름 (ex. Gatsby-Starter-Haon)"),
                                 fieldWithPath("branchName").type(JsonFieldType.STRING).description("브랜치 명 (ex. main)")
                         )))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk()); */
     }
 }

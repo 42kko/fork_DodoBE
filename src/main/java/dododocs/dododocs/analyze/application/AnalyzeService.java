@@ -10,6 +10,7 @@ import dododocs.dododocs.analyze.dto.ExternalAiZipAnalyzeRequest;
 import dododocs.dododocs.analyze.dto.ExternalAiZipAnalyzeResponse;
 import dododocs.dododocs.analyze.dto.RepositoryContentDto;
 import dododocs.dododocs.analyze.dto.UploadGitRepoContentToS3Request;
+import dododocs.dododocs.analyze.exception.MaxSizeRepoRegiserException;
 import dododocs.dododocs.analyze.infrastructure.ExternalAiZipAnalyzeClient;
 import dododocs.dododocs.auth.domain.repository.MemberRepository;
 import dododocs.dododocs.auth.exception.NoExistMemberException;
@@ -38,6 +39,7 @@ import java.util.zip.ZipOutputStream;
 @RequiredArgsConstructor
 @Service
 public class AnalyzeService {
+    private static final Integer REPO_REGISTER_MAX_SIZE = 3;
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final RestTemplate restTemplate;
     private final ExternalAiZipAnalyzeClient externalAiZipAnalyzeClient;
@@ -48,12 +50,19 @@ public class AnalyzeService {
 
     // GitHub 레포지토리를 ZIP 파일로 가져와 S3에 업로드
     public void uploadGithubRepoToS3(final UploadGitRepoContentToS3Request uploadGitRepoContentToS3Request, final long memberId) {
+
         final String repoName = uploadGitRepoContentToS3Request.getRepositoryName();
         final String branchName = uploadGitRepoContentToS3Request.getBranchName();
 
         // Member를 조회
-        Member member = memberRepository.findById(memberId)
+        final Member member = memberRepository.findById(memberId)
                 .orElseThrow(NoExistMemberException::new);
+
+        final List<RepoAnalyze> repoAnalyzes = repoAnalyzeRepository.findByMember(member);
+
+        if(repoAnalyzes.size() >= REPO_REGISTER_MAX_SIZE) {
+            throw new MaxSizeRepoRegiserException("최대 3개의 레포지토리를 등록 가능합니다.");
+        }
 
         // 개인 소유자로 먼저 시도
         String ownerName = member.getOriginName();
@@ -75,7 +84,7 @@ public class AnalyzeService {
 
         ExternalAiZipAnalyzeResponse externalAiZipAnalyzeResponse =
                 externalAiZipAnalyzeClient.requestAiZipDownloadAndAnalyze(new ExternalAiZipAnalyzeRequest
-                        (s3Key, String.format("https://github.com/%s/%s", ownerName, repoName), readmeBlocks, false, uploadGitRepoContentToS3Request.isKorean()));
+                        (s3Key, String.format("https://github.com/%s/%s", ownerName, repoName), List.of(), false, uploadGitRepoContentToS3Request.isKorean()));
 
         // 1. readMeS3Key / 2. docsS3Key
 
