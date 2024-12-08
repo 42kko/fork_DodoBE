@@ -50,7 +50,6 @@ public class AnalyzeService {
     public void uploadGithubRepoToS3(final UploadGitRepoContentToS3Request uploadGitRepoContentToS3Request, final long memberId) {
         final String repoName = uploadGitRepoContentToS3Request.getRepositoryName();
         final String branchName = uploadGitRepoContentToS3Request.getBranchName();
-        final List<String> readmeBlocks = uploadGitRepoContentToS3Request.getReadmeBlocks();
 
         // Member를 조회
         Member member = memberRepository.findById(memberId)
@@ -87,6 +86,7 @@ public class AnalyzeService {
         // 4. ownerName (ex. msung99)
         repoAnalyzeRepository.save(
                 new RepoAnalyze(repoName,
+                        branchName,
                         // "kakao-25_moheng_DOCS.zip",
                         // "kakao-25_moheng_DOCS.zip",
                         externalAiZipAnalyzeResponse.getReadMeS3Key(),

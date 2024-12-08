@@ -1,5 +1,6 @@
 package dododocs.dododocs.analyze.domain;
 
+import dododocs.dododocs.global.BaseEntity;
 import dododocs.dododocs.member.domain.Member;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -7,13 +8,16 @@ import lombok.Getter;
 @Table(name = "repo_analyze")
 @Getter
 @Entity
-public class RepoAnalyze {
+public class RepoAnalyze extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "repository_name")
     private String repositoryName;
+
+    @Column(name = "branch_name")
+    private String branchName;
 
     @Column(name = "readme_key", nullable = false)
     private String readMeKey;
@@ -31,8 +35,9 @@ public class RepoAnalyze {
     protected RepoAnalyze() {
     }
 
-    public RepoAnalyze(final String repositoryName, final String readMeKey, final String docsKey, final String repoUrl, final Member member) {
+    public RepoAnalyze(final String repositoryName, final String branchName, final String readMeKey, final String docsKey, final String repoUrl, final Member member) {
         this.repositoryName = repositoryName;
+        this.branchName = branchName;
         this.readMeKey = readMeKey;
         this.docsKey = docsKey;
         this.repoUrl = repoUrl;

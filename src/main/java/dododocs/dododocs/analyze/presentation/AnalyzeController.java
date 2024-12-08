@@ -37,6 +37,11 @@ public class AnalyzeController {
         this.analyzeService = analyzeService;
     }
 
+    // 1. 등록한 레포 리스트 뭐 되어있는지 조회 (유저당 최대 3개 레포 등록 가능)
+    // 2. 레포 등록시 DTO 수정 (korean, test 코드 넣을꺼임?)
+    // 3. 리드미 문자열 수정한거 DB 에 반영하기
+    // => Test API 에 리드미 수정한거 반영하기
+
     @PostMapping("/upload/s3")
     public void uploadGithubToS3(@Authentication final Accessor accessor,
                                    @RequestBody final UploadGitRepoContentToS3Request uploadToS3Request) {
