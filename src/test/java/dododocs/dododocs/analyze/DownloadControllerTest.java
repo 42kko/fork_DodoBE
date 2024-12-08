@@ -3,6 +3,7 @@ package dododocs.dododocs.analyze;
 import dododocs.dododocs.analyze.dto.DownloadAiAnalyzeRequest;
 import dododocs.dododocs.analyze.dto.DownloadAiAnalyzeResponse;
 import dododocs.dododocs.analyze.exception.NoExistRepoAnalyzeException;
+import dododocs.dododocs.auth.dto.LoginRequest;
 import dododocs.dododocs.config.ControllerTestConfig;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -22,9 +23,11 @@ import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.docu
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 public class DownloadControllerTest extends ControllerTestConfig {
@@ -35,16 +38,21 @@ public class DownloadControllerTest extends ControllerTestConfig {
         // given
         given(jwtTokenCreator.extractMemberId(anyString())).willReturn(1L);
         given(downloadFromS3Service.downloadAndProcessZip(anyString()))
-                .willReturn( new DownloadAiAnalyzeResponse(
-                                List.of(Map.of("fileName", "summary1.txt", "filePath", "/path/to/summary1.txt")),
-                                List.of(Map.of("fileName", "regular1.txt", "filePath", "/path/to/regular1.txt"))));
+                .willReturn(new DownloadAiAnalyzeResponse(
+                        List.of(new DownloadAiAnalyzeResponse.FileDetail("Controller_Summary.md", "전체 컨트롤러 요약 내용"),
+                                new DownloadAiAnalyzeResponse.FileDetail("Service_Summary.md", "전체 서비스 요약 내용")),
+                        List.of(new DownloadAiAnalyzeResponse.FileDetail("AuthController.md", "설명1"),
+                                new DownloadAiAnalyzeResponse.FileDetail("AuthService.md", "설명2"),
+                                new DownloadAiAnalyzeResponse.FileDetail("TravelController.md", "설명3"))
+                ));
+
 
         // when, then
         mockMvc.perform(post("/api/download/s3")
                         .header("Authorization", "Bearer aaaaaa.bbbbbb.cccccc")
+                        .queryParam("repositoryName", "dododocs")
                         .accept(MediaType.APPLICATION_JSON)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(new DownloadAiAnalyzeRequest("Gatsby-Starter-Haon"))))
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andDo(document("analyze/download/success",
                         preprocessRequest(prettyPrint()),
@@ -52,16 +60,16 @@ public class DownloadControllerTest extends ControllerTestConfig {
                         requestHeaders(
                                 headerWithName("Authorization").description("엑세스 토큰")
                         ),
-                        requestFields(
-                                fieldWithPath("repositoryName").description("AI 문서화 결과를 다운 받을 레포지토리 이름")
+                        queryParameters(
+                                parameterWithName("repositoryName").description("다운로드 받을 레포명")
                         ),
                         responseFields(
                                 fieldWithPath("summaryFiles[]").type(JsonFieldType.ARRAY).description("요약 파일 목록"),
                                 fieldWithPath("summaryFiles[].fileName").type(JsonFieldType.STRING).description("요약 파일 이름"),
-                                fieldWithPath("summaryFiles[].filePath").type(JsonFieldType.STRING).description("요약 파일 경로"),
+                                fieldWithPath("summaryFiles[].fileContents").type(JsonFieldType.STRING).description("요약 파일 내용"),
                                 fieldWithPath("regularFiles[]").type(JsonFieldType.ARRAY).description("일반 파일 목록"),
                                 fieldWithPath("regularFiles[].fileName").type(JsonFieldType.STRING).description("일반 파일 이름"),
-                                fieldWithPath("regularFiles[].filePath").type(JsonFieldType.STRING).description("일반 파일 경로")
+                                fieldWithPath("regularFiles[].fileContents").type(JsonFieldType.STRING).description("일반 파일 내용")
                         )
                 ))
                 .andExpect(status().isOk());
@@ -78,20 +86,55 @@ public class DownloadControllerTest extends ControllerTestConfig {
         // when, then
         mockMvc.perform(post("/api/download/s3")
                         .header("Authorization", "Bearer aaaaaa.bbbbbb.cccccc")
-                        .accept(MediaType.APPLICATION_JSON)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(new DownloadAiAnalyzeRequest("Gatsby-Starter-Haon"))))
+                        .queryParam("repositoryName", "dododocs")
+                         .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andDo(document("analyze/download/fail",
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
-                        requestHeaders(
-                                headerWithName("Authorization").description("엑세스 토큰")
-                        ),
-                        requestFields(
-                                fieldWithPath("repositoryName").description("AI 문서화 결과를 다운 받을 레포지토리 이름")
+                        queryParameters(
+                                parameterWithName("repositoryName").description("다운로드 받을 레포명")
                         )
                 ))
                 .andExpect(status().isBadRequest());
+    }
+
+    @DisplayName("레포에서 특정 파일명 입력했을 때, 그에 대한 리드미 내용을 제공한다.")
+    @Test
+    void getFileContentByFileName_ValidFile_ReturnsContent() throws Exception {
+        // given
+        given(authService.extractMemberId(anyString())).willReturn(1L);
+        given(downloadFromS3Service.downloadAndProcessZip(anyString())).willReturn(
+                new DownloadAiAnalyzeResponse(
+                        List.of(new DownloadAiAnalyzeResponse.FileDetail("Controller_Summary.md", "전체 컨트롤러 요약 내용")),
+                        List.of(new DownloadAiAnalyzeResponse.FileDetail("AuthService.md", "설명2"))
+                )
+        );
+
+        // when, then
+        mockMvc.perform(get("/api/download/s3/detail")
+                        .header("Authorization", "Bearer aaaaaa.bbbbbb.cccccc")
+                        .param("repositoryName", "my-repo")
+                        .param("fileName", "Controller_Summary.md")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andDo(document("download/repo/file/detail/success",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        requestHeaders(
+                                headerWithName("Authorization").description("OAuth 인증 토큰")
+                        ),
+                        queryParameters(
+                                parameterWithName("repositoryName").description("조회할 레포 이름"),
+                                parameterWithName("fileName").description("조회할 파일 이름")
+                        ),
+                        responseFields(
+                                fieldWithPath("fileName").description("요청한 파일 이름"),
+                                fieldWithPath("fileContents").description("해당 파일의 내용")
+                        )
+                ))
+                .andExpect(status().isOk());
     }
 }

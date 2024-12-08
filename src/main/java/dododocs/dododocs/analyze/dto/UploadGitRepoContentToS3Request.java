@@ -13,8 +13,10 @@ public class UploadGitRepoContentToS3Request {
     private String repositoryName;
     private String branchName;
     private boolean korean;
-    private boolean containTest;
-    // private List<String> readmeBlocks;
+    private boolean includeTest;
+}
+
+// private List<String> readmeBlocks;
     /* private boolean previewBlock;
     private boolean overviewBlock;
     private boolean analysisBlock;
@@ -26,7 +28,6 @@ public class UploadGitRepoContentToS3Request {
     private boolean contributorsBlock;
     private boolean faqBlock;
     private boolean performanceBlock; */
-}
 
 /*
 README_BLOCKS = {

@@ -44,12 +44,17 @@ public class AnalyzeController {
 
     @PostMapping("/upload/s3")
     public void uploadGithubToS3(@Authentication final Accessor accessor,
-                                   @RequestBody final UploadGitRepoContentToS3Request uploadToS3Request) {
+                                 @RequestBody final UploadGitRepoContentToS3Request uploadToS3Request) {
         // s3 key 값, 레포 주소 필요
         analyzeService.uploadGithubRepoToS3(uploadToS3Request, accessor.getId());
     }
 
-    // 레포지토리 폴더 및 파일 구조 반환
+    @PutMapping("/readme/update")
+    public void updateReadmeContents() {
+
+    }
+
+
     @GetMapping("/repo/contents")
     public RepositoryContentDto getRepoContents(@Authentication final Accessor accessor,
                                                 @RequestBody final FindGitRepoContentRequest findGitRepoContentRequest) throws IOException {

@@ -49,7 +49,7 @@ public class AnalyzeControllerTest extends ControllerTestConfig {
                                 fieldWithPath("repositoryName").type(JsonFieldType.STRING).description("분석 할 레포지토리 이름 (ex. Gatsby-Starter-Haon)"),
                                 fieldWithPath("branchName").type(JsonFieldType.STRING).description("브랜치 명 (ex. main)"),
                                 fieldWithPath("korean").type(JsonFieldType.BOOLEAN).description("한국어 번역 여부"),
-                                fieldWithPath("readmeBlocks").description("리드미 템플릿 생성 옵션. PREVIEW_BLOCK, ANALYSIS_BLOCK, STRUCTURE_BLOCK, START_BLOCK, MOTIVATION_BLOCK, DEMO_BLOCK, DEPLOYMENT_BLOCK, CONTRIBUTORS_BLOCK, FAQ_BLOCK, PERFORMANCE_BLOCK")
+                                fieldWithPath("includeTest").type(JsonFieldType.BOOLEAN).description("테스트 포함 여부")
                 )))
                 .andExpect(status().isOk());
     }
@@ -79,7 +79,7 @@ public class AnalyzeControllerTest extends ControllerTestConfig {
                                 fieldWithPath("repositoryName").type(JsonFieldType.STRING).description("분석 할 레포지토리 이름 (ex. Gatsby-Starter-Haon)"),
                                 fieldWithPath("branchName").type(JsonFieldType.STRING).description("브랜치 명 (ex. main)"),
                                 fieldWithPath("korean").type(JsonFieldType.BOOLEAN).description("한국어 번역 여부"),
-                                fieldWithPath("readmeBlocks").description("리드미 템플릿 생성 옵션. PREVIEW_BLOCK, ANALYSIS_BLOCK, STRUCTURE_BLOCK, START_BLOCK, MOTIVATION_BLOCK, DEMO_BLOCK, DEPLOYMENT_BLOCK, CONTRIBUTORS_BLOCK, FAQ_BLOCK, PERFORMANCE_BLOCK")
+                                fieldWithPath("includeTest").type(JsonFieldType.BOOLEAN).description("테스트 포함 여부")
                 )))
                 .andExpect(status().isBadRequest());
     }

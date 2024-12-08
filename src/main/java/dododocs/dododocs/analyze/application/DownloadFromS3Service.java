@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+
 @RequiredArgsConstructor
 @Service
 public class DownloadFromS3Service {
@@ -35,8 +36,8 @@ public class DownloadFromS3Service {
         // 2. ZIP 파일 압축 해제
         File extractedDir = unzipFile(zipFile);
 
-        // 3. .md 파일을 Map으로 변환하여 분류
-        Map<String, List<Map<String, String>>> categorizedFiles = collectAndCategorizeMarkdownFiles(extractedDir);
+        // 3. .md 파일을 FileDetail 형식으로 변환하여 분류
+        Map<String, List<DownloadAiAnalyzeResponse.FileDetail>> categorizedFiles = collectAndCategorizeMarkdownFiles(extractedDir);
 
         // 4. 임시 파일 삭제
         zipFile.delete();
@@ -48,25 +49,23 @@ public class DownloadFromS3Service {
     private File downloadZipFromS3(String bucketName, String s3Key) throws IOException {
         File tempZipFile = File.createTempFile("s3-download", ".zip");
 
-        InputStream inputStream = null;
+        try (InputStream inputStream = amazonS3Client.getObject(bucketName, s3Key).getObjectContent();
+             FileOutputStream outputStream = new FileOutputStream(tempZipFile)) {
 
-        try {
-            inputStream = amazonS3Client.getObject(bucketName, s3Key).getObjectContent();
+            byte[] buffer = new byte[8192];
+            int bytesRead;
+            while ((bytesRead = inputStream.read(buffer)) != -1) {
+                outputStream.write(buffer, 0, bytesRead);
+            }
         } catch (Exception e) {
             throw new NoExistRepoAnalyzeException("레포지토리 결과물을 아직 생성중입니다. 잠시만 기다려주세요.");
-        }
-        FileOutputStream outputStream = new FileOutputStream(tempZipFile);
-
-        byte[] buffer = new byte[8192];int bytesRead;
-        while ((bytesRead = inputStream.read(buffer)) != -1) {
-            outputStream.write(buffer, 0, bytesRead);
         }
 
         return tempZipFile;
     }
 
     private File unzipFile(File zipFile) throws IOException {
-        File outputDir = new File(zipFile.getParent(), "extacted");
+        File outputDir = new File(zipFile.getParent(), "extracted");
         if (!outputDir.exists()) {
             outputDir.mkdirs();
         }
@@ -95,31 +94,30 @@ public class DownloadFromS3Service {
         return outputDir;
     }
 
-    private Map<String, List<Map<String, String>>> collectAndCategorizeMarkdownFiles(File directory) throws IOException {
-        List<Map<String, String>> summaryFiles = new ArrayList<>();
-        List<Map<String, String>> regularFiles = new ArrayList<>();
+    private Map<String, List<DownloadAiAnalyzeResponse.FileDetail>> collectAndCategorizeMarkdownFiles(File directory) throws IOException {
+        List<DownloadAiAnalyzeResponse.FileDetail> summaryFiles = new ArrayList<>();
+        List<DownloadAiAnalyzeResponse.FileDetail> regularFiles = new ArrayList<>();
         File[] files = directory.listFiles();
 
         if (files != null) {
             for (File file : files) {
                 if (file.isDirectory()) {
-                    Map<String, List<Map<String, String>>> subCategory = collectAndCategorizeMarkdownFiles(file);
+                    Map<String, List<DownloadAiAnalyzeResponse.FileDetail>> subCategory = collectAndCategorizeMarkdownFiles(file);
                     summaryFiles.addAll(subCategory.get("summary"));
                     regularFiles.addAll(subCategory.get("regular"));
                 } else if (file.getName().endsWith(".md")) {
-                    Map<String, String> fileData = new HashMap<>();
-                    fileData.put(file.getName(), readFileContent(file));
+                    DownloadAiAnalyzeResponse.FileDetail fileDetail = new DownloadAiAnalyzeResponse.FileDetail(file.getName(), readFileContent(file));
 
                     if (file.getName().contains("_summary")) {
-                        summaryFiles.add(fileData);
+                        summaryFiles.add(fileDetail);
                     } else {
-                        regularFiles.add(fileData);
+                        regularFiles.add(fileDetail);
                     }
                 }
             }
         }
 
-        Map<String, List<Map<String, String>>> categorizedFiles = new HashMap<>();
+        Map<String, List<DownloadAiAnalyzeResponse.FileDetail>> categorizedFiles = new HashMap<>();
         categorizedFiles.put("summary", summaryFiles);
         categorizedFiles.put("regular", regularFiles);
 

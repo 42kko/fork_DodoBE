@@ -44,7 +44,7 @@ public class MemberControllerTest extends ControllerTestConfig {
                 .willReturn(new FindRepoNameListResponse(List.of("repo-name1", "repo-name2", "repo-name3")));
 
         // when, then
-        mockMvc.perform(get("/api/member/repos")
+        mockMvc.perform(get("/api/member/repos/all")
                         .header("Authorization", "Bearer aaaaaa.bbbbbb.cccccc")
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON))
