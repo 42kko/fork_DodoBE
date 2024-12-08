@@ -148,4 +148,96 @@ public class DownloadFromS3Service {
         }
         directory.delete();
     }
+
+
+
+
+
+
+
+    ///// // 리드미 업데이트
+    public void updateFileContent(String repoName, String fileName, String newContent) throws IOException {
+        // 1. 레포지토리 정보 확인
+        RepoAnalyze repoAnalyze = repoAnalyzeRepository.findByRepositoryName(repoName)
+                .orElseThrow(() -> new NoExistRepoAnalyzeException("레포지토리 정보가 존재하지 않습니다."));
+
+        String s3Key = repoAnalyze.getDocsKey();
+
+        // 2. S3에서 ZIP 파일 다운로드
+        File zipFile = downloadZipFromS3(bucketName, s3Key);
+
+        // 3. ZIP 파일 압축 해제
+        File extractedDir = unzipFile(zipFile);
+
+        // 4. 파일 내용 업데이트
+        updateMarkdownFileContent(extractedDir, fileName, newContent);
+
+        // 5. ZIP 파일 다시 생성 및 업로드
+        File updatedZip = createZipFromDirectory(extractedDir);
+        uploadZipToS3(bucketName, s3Key, updatedZip);
+
+        // 6. 임시 파일 삭제
+        zipFile.delete();
+        updatedZip.delete();
+        deleteDirectory(extractedDir);
+    }
+
+    private void updateMarkdownFileContent(File directory, String fileName, String newContent) throws IOException {
+        File[] files = directory.listFiles();
+
+        if (files != null) {
+            for (File file : files) {
+                if (file.isDirectory()) {
+                    updateMarkdownFileContent(file, fileName, newContent);
+                } else if (file.getName().equals(fileName)) {
+                    try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
+                        writer.write(newContent);
+                    }
+                    return;
+                }
+            }
+        }
+        throw new FileNotFoundException("파일을 찾을 수 없습니다: " + fileName);
+    }
+
+    private File createZipFromDirectory(File directory) throws IOException {
+        File zipFile = File.createTempFile("updated", ".zip");
+
+        try (FileOutputStream fos = new FileOutputStream(zipFile);
+             BufferedOutputStream bos = new BufferedOutputStream(fos);
+             java.util.zip.ZipOutputStream zos = new java.util.zip.ZipOutputStream(bos)) {
+
+            zipDirectory(directory, directory.getPath(), zos);
+        }
+
+        return zipFile;
+    }
+
+    private void zipDirectory(File folder, String basePath, java.util.zip.ZipOutputStream zos) throws IOException {
+        File[] files = folder.listFiles();
+
+        if (files != null) {
+            for (File file : files) {
+                if (file.isDirectory()) {
+                    zipDirectory(file, basePath, zos);
+                } else {
+                    String zipEntryName = file.getPath().substring(basePath.length() + 1);
+                    zos.putNextEntry(new java.util.zip.ZipEntry(zipEntryName));
+
+                    try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file))) {
+                        byte[] buffer = new byte[1024];
+                        int read;
+                        while ((read = bis.read(buffer)) != -1) {
+                            zos.write(buffer, 0, read);
+                        }
+                    }
+                    zos.closeEntry();
+                }
+            }
+        }
+    }
+
+    private void uploadZipToS3(String bucketName, String s3Key, File zipFile) {
+        amazonS3Client.putObject(bucketName, s3Key, zipFile);
+    }
 }

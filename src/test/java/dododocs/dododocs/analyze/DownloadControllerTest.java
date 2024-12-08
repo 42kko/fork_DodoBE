@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;
 
+import java.io.FileNotFoundException;
 import java.util.List;
 import java.util.Map;
 
@@ -115,8 +116,8 @@ public class DownloadControllerTest extends ControllerTestConfig {
         // when, then
         mockMvc.perform(get("/api/download/s3/detail")
                         .header("Authorization", "Bearer aaaaaa.bbbbbb.cccccc")
-                        .param("repositoryName", "my-repo")
-                        .param("fileName", "Controller_Summary.md")
+                        .queryParam("repositoryName", "my-repo")
+                        .queryParam("fileName", "Controller_Summary.md")
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
@@ -124,7 +125,7 @@ public class DownloadControllerTest extends ControllerTestConfig {
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
                         requestHeaders(
-                                headerWithName("Authorization").description("OAuth 인증 토큰")
+                                headerWithName("Authorization").description("토큰")
                         ),
                         queryParameters(
                                 parameterWithName("repositoryName").description("조회할 레포 이름"),
@@ -136,5 +137,36 @@ public class DownloadControllerTest extends ControllerTestConfig {
                         )
                 ))
                 .andExpect(status().isOk());
+    }
+
+    @DisplayName("리드미 내용을 수정하고 성공 메시지를 반환한다.")
+    @Test
+    void updateFileContent_Success_ReturnsOk() throws Exception {
+        // given
+        doNothing().when(downloadFromS3Service)
+                .updateFileContent(anyString(), anyString(), anyString());
+
+        // when, then
+        mockMvc.perform(put("/api/readme")
+                        .header("Authorization", "Bearer aaaaaa.bbbbbb.cccccc")
+                        .queryParam("repositoryName", "dododocs")
+                        .queryParam("fileName", "Controller_Summary.md")
+                        .queryParam("newContent", "new contents~~")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andDo(document("readme/update/success",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        requestHeaders(
+                                headerWithName("Authorization").description("토큰")
+                        ),
+                        queryParameters(
+                                parameterWithName("repositoryName").description("레포지토리 이름"),
+                                parameterWithName("fileName").description("리드미 파일 이름"),
+                                parameterWithName("newContent").description("새롭게 수정할 리드미 내용")
+                        )
+                ))
+                .andExpect(status().isNoContent());
     }
 }

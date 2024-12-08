@@ -5,7 +5,7 @@
 :toc: left
 :toclevels: 2
 
-=== AI README 분석 결과 조회
+=== AI README 분석 결과 조회 테스트 API
 
 ==== HTTP Request
 
@@ -14,4 +14,18 @@ include::{snippets}/test/analyze/result/success/http-request.adoc[]
 ==== HTTP Response
 
 include::{snippets}/test/analyze/result/success/http-response.adoc[]
+
+=== 리드미 수정 테스트 API
+
+==== HTTP Request
+
+include::{snippets}/test/readme/update/success/http-request.adoc[]
+
+===== Request Param
+
+include::{snippets}/test/readme/update/success/query-parameters.adoc[]
+
+==== HTTP Response
+
+include::{snippets}/readme/update/success/http-response.adoc[]
 

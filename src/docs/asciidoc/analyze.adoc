@@ -98,3 +98,17 @@ include::{snippets}/download/repo/file/detail/success/http-response.adoc[]
 ===== Response Body
 
 include::{snippets}/download/repo/file/detail/success/response-fields.adoc[]
+
+=== 리드미 내용 수정 API
+
+==== HTTP Request
+
+include::{snippets}/readme/update/success/http-request.adoc[]
+
+===== Request Param
+
+include::{snippets}/readme/update/success/query-parameters.adoc[]
+
+==== HTTP Response
+
+include::{snippets}/readme/update/success/http-response.adoc[]

@@ -7,26 +7,30 @@ import dododocs.dododocs.analyze.dto.DownloadAiAnalyzeResponse;
 import dododocs.dododocs.analyze.dto.FileContentResponse;
 import dododocs.dododocs.auth.dto.Accessor;
 import dododocs.dododocs.auth.presentation.authentication.Authentication;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.apache.catalina.LifecycleState;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Map;
 
-@RequestMapping("/api/download")
+@RequestMapping("/api")
 @RestController
 @RequiredArgsConstructor
 public class S3DownloadController {
     private final DownloadFromS3Service s3DownloadService;
+    private final DownloadFromS3Service downloadFromS3Service;
 
-    @PostMapping("/s3")
+    @PostMapping("/download/s3")
     public DownloadAiAnalyzeResponse downloadAIAnalyzeResultFromS3(@RequestParam final String repositoryName) throws Exception {
         return s3DownloadService.downloadAndProcessZip(repositoryName);
     }
 
-    @GetMapping("/s3/detail")
+    @GetMapping("/download/s3/detail")
     public FileContentResponse getFileContentByFileName(@RequestParam final String repositoryName,
                                                         @RequestParam final String fileName) throws Exception {
         DownloadAiAnalyzeResponse response = s3DownloadService.downloadAndProcessZip(repositoryName);
@@ -40,5 +44,13 @@ public class S3DownloadController {
                         .findFirst())
                 .map(file -> new FileContentResponse(file.getFileName(), file.getFileContents()))
                 .orElseThrow(() -> new RuntimeException("File not found"));
+    }
+
+    @PutMapping("/readme")
+    public ResponseEntity<Void> updateFileContent(
+            @Authentication final Accessor accessor,
+            @RequestParam String repositoryName, @RequestParam String fileName, @RequestParam String newContent) throws Exception {
+        downloadFromS3Service.updateFileContent(repositoryName, fileName, newContent);
+        return ResponseEntity.noContent().build();
     }
 }
