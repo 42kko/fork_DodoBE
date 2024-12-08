@@ -5,19 +5,7 @@
 :toc: left
 :toclevels: 2
 
-=== 깃허브 레포지토리 실제 코드 조회 요청
-
-include::{snippets}/find/repo/content/success/http-request.adoc[]
-
-==== Request Body
-
-include::{snippets}/find/repo/content/success/request-fields.adoc[]
-
-==== HTTP Response
-
-include::{snippets}/find/repo/content/success/http-response.adoc[]
-
-=== AI 분석 및 문서화 요청
+=== AI 분석 및 문서화 요청 (레포 등록)
 
 include::{snippets}/analyze/upload/success/http-request.adoc[]
 
@@ -39,9 +27,9 @@ include::{snippets}/analyze/upload/success/http-response.adoc[]
 
 include::{snippets}/analyze/download/success/http-request.adoc[]
 
-==== Request Body
+==== Request Param
 
-include::{snippets}/analyze/download/success/request-fields.adoc[]
+include::{snippets}/analyze/download/success/query-parameters.adoc[]
 
 ==== HTTP Response
 
@@ -87,3 +75,26 @@ include::{snippets}/register/delete/success/request-fields.adoc[]
 ==== HTTP Response
 
 include::{snippets}/register/delete/success/http-response.adoc[]
+
+
+=== 레포에서 특정 파일명 입력했을 때, 그에 대한 리드미 내용을 제공 API
+
+==== HTTP Request
+
+include::{snippets}/download/repo/file/detail/success/http-request.adoc[]
+
+===== Request Header
+
+include::{snippets}/download/repo/file/detail/success/request-headers.adoc[]
+
+===== Query Param
+
+include::{snippets}/download/repo/file/detail/success/query-parameters.adoc[]
+
+==== HTTP Response
+
+include::{snippets}/download/repo/file/detail/success/http-response.adoc[]
+
+===== Response Body
+
+include::{snippets}/download/repo/file/detail/success/response-fields.adoc[]
