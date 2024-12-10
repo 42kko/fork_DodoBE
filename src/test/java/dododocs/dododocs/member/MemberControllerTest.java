@@ -96,4 +96,11 @@ public class MemberControllerTest extends ControllerTestConfig {
                 ))
                 .andExpect(status().isOk());
     }
+
+    @DisplayName("멤버의 기본 프로필 정보를 조회하고 상태코드 200을 리턴한다.")
+    @Test
+    void findMemberInfoTest() {
+        given(authService.extractMemberId(anyString())).willReturn(1L);
+
+    }
 }

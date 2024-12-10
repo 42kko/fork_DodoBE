@@ -2,6 +2,7 @@ package dododocs.dododocs.member.presentation;
 
 import dododocs.dododocs.auth.dto.Accessor;
 import dododocs.dododocs.auth.presentation.authentication.Authentication;
+import dododocs.dododocs.chatbot.dto.FindMemberInfoResponse;
 import dododocs.dododocs.member.application.MemberService;
 import dododocs.dododocs.member.dto.FindRegisterMemberRepoResponses;
 import dododocs.dododocs.member.dto.FindRepoNameListResponse;
@@ -28,5 +29,10 @@ public class MemberController {
     @GetMapping("/repos/registered")
     public ResponseEntity<FindRegisterMemberRepoResponses> findMemberRepoRegisteredList(@Authentication final Accessor accessor) {
         return ResponseEntity.ok(memberService.findRegisterMemberRepoResponses(accessor.getId()));
+    }
+
+    @GetMapping("/info")
+    public ResponseEntity<FindMemberInfoResponse> findMemberInfo(@Authentication final Accessor accessor) {
+        return ResponseEntity.ok(memberService.findMemberInfo(accessor.getId()));
     }
 }

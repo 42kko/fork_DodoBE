@@ -6,6 +6,7 @@ import dododocs.dododocs.analyze.domain.RepoAnalyze;
 import dododocs.dododocs.analyze.domain.repository.RepoAnalyzeRepository;
 import dododocs.dododocs.auth.domain.repository.MemberRepository;
 import dododocs.dododocs.auth.exception.NoExistMemberException;
+import dododocs.dododocs.chatbot.dto.FindMemberInfoResponse;
 import dododocs.dododocs.member.domain.Member;
 import dododocs.dododocs.member.dto.FindRegisterMemberRepoResponses;
 import dododocs.dododocs.member.dto.FindRepoNameListResponse;
@@ -57,5 +58,12 @@ public class MemberService {
 
         final List<RepoAnalyze> repoAnalyzes = repoAnalyzeRepository.findByMember(member);
         return new FindRegisterMemberRepoResponses(repoAnalyzes);
+    }
+
+    public FindMemberInfoResponse findMemberInfo(final long memberId) {
+        final Member member = memberRepository.findById(memberId)
+                .orElseThrow(NoExistMemberException::new);
+
+        return new FindMemberInfoResponse(member.getOriginName());
     }
 }
