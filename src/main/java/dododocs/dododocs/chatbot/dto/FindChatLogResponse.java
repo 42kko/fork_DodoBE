@@ -3,6 +3,7 @@ package dododocs.dododocs.chatbot.dto;
 import dododocs.dododocs.chatbot.domain.ChatLog;
 import lombok.Getter;
 
+@Getter
 public class FindChatLogResponse {
     private String question;
     private String answer;

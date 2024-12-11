@@ -15,6 +15,8 @@ import dododocs.dododocs.auth.domain.repository.MemberRepository;
 import dododocs.dododocs.auth.infrastructure.GithubOAuthClient;
 import dododocs.dododocs.auth.presentation.AuthController;
 import dododocs.dododocs.auth.presentation.authentication.AuthenticationBearerExtractor;
+import dododocs.dododocs.chatbot.application.ChatbotService;
+import dododocs.dododocs.chatbot.presentation.ChatbotController;
 import dododocs.dododocs.global.config.S3Config;
 import dododocs.dododocs.member.application.MemberService;
 import dododocs.dododocs.member.presentation.MemberController;
@@ -37,6 +39,7 @@ import org.springframework.test.web.servlet.MockMvc;
         AnalyzeController.class,
         ApiTestController.class,
         RepoRegisterController.class,
+        // ChatbotController.class,
 })
 @Import(TestConfig.class)
 @ActiveProfiles("test")
@@ -79,4 +82,7 @@ public abstract class ControllerTestConfig {
 
     @MockBean
     protected RepoRegisterService repoRegisterService;
+
+    @MockBean
+    protected ChatbotService chatbotService;
 }

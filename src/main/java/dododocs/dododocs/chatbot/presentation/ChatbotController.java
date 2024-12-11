@@ -3,6 +3,7 @@ package dododocs.dododocs.chatbot.presentation;
 import dododocs.dododocs.auth.dto.Accessor;
 import dododocs.dododocs.auth.presentation.authentication.Authentication;
 import dododocs.dododocs.chatbot.application.ChatbotService;
+import dododocs.dododocs.chatbot.dto.ExternalQuestToChatbotResponse;
 import dododocs.dododocs.chatbot.dto.FindChatLogResponses;
 import dododocs.dododocs.chatbot.dto.QuestToChatbotRequest;
 import lombok.RequiredArgsConstructor;
@@ -12,16 +13,16 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.data.domain.Pageable;
 
 @RequiredArgsConstructor
-@RestController("/api/chatbot")
+@RestController
+@RequestMapping("/api/chatbot")
 public class ChatbotController {
     private final ChatbotService chatbotService;
 
     @PostMapping("/question/save/{registeredRepoId}")
-    public ResponseEntity<Void> questionToChatbotAndSaveLogs(@Authentication final Accessor accessor,
+    public ResponseEntity<ExternalQuestToChatbotResponse> questionToChatbotAndSaveLogs(@Authentication final Accessor accessor,
                                                              @PathVariable final Long registeredRepoId,
                                                              @RequestBody final QuestToChatbotRequest questToChatbotRequest) {
-        chatbotService.questionToChatbotAndSaveLogs(registeredRepoId, questToChatbotRequest.getQuestion());
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(chatbotService.questionToChatbotAndSaveLogs(registeredRepoId, questToChatbotRequest.getQuestion()));
     }
 
     @GetMapping("/logs/{registeredRepoId}")

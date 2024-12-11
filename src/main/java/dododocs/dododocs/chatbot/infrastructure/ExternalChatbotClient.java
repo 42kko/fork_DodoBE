@@ -15,11 +15,11 @@ import java.util.Map;
 @Component
 public class ExternalChatbotClient {
     private final String aiBasicUrl;
-    private static final String CHATBOT_QUESTION_REQUEST_URL_PREFIX = "";
+    private static final String CHATBOT_QUESTION_REQUEST_URL_PREFIX = "/chat";
     private final RestTemplate restTemplate;
 
     public ExternalChatbotClient(final RestTemplate restTemplate,
-                                 @Value("${AI_BASIC_URL}") final String aiBasicUrl) {
+                                 @Value("${ai.basic_url}") final String aiBasicUrl) {
         this.restTemplate = restTemplate;
         this.aiBasicUrl = aiBasicUrl;
     }

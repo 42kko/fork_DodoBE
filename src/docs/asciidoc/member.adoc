@@ -45,3 +45,21 @@ include::{snippets}/repos/registered/find/success/http-response.adoc[]
 ==== Response Field
 
 include::{snippets}/repos/registered/find/success/response-fields.adoc[]
+
+=== 멤버 기본 프로필 정보 조회
+
+==== HTTP Request
+
+include::{snippets}/member/profile/success/http-request.adoc[]
+
+===== Request Header
+
+include::{snippets}/member/profile/success/request-headers.adoc[]
+
+==== HTTP Response
+
+include::{snippets}/member/profile/success/http-response.adoc[]
+
+===== Response Fields
+
+include::{snippets}/member/profile/success/response-fields.adoc[]

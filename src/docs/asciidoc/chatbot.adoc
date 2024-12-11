@@ -1,0 +1,44 @@
+== ⛳️ Chatbot (챗봇)
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 2
+
+=== 챗봇 대화 내역 불러오기
+
+==== HTTP Request
+
+include::{snippets}/chatbot/find/logs/success/http-request.adoc[]
+
+==== Request Header
+
+include::{snippets}/chatbot/find/logs/success/request-headers.adoc[]
+
+==== HTTP Response
+
+include::{snippets}/chatbot/find/logs/success/http-response.adoc[]
+
+
+=== 챗봇에게 질문하기
+
+==== HTTP Request
+
+include::{snippets}/chatbot/ask/success/http-request.adoc[]
+
+===== Request Header
+
+include::{snippets}/chatbot/ask/success/request-headers.adoc[]
+
+===== Request Body
+
+include::{snippets}/chatbot/ask/success/request-fields.adoc[]
+
+
+==== HTTP Response
+
+include::{snippets}/chatbot/ask/success/http-response.adoc[]
+
+==== Response Body
+
+include::{snippets}/chatbot/ask/success/response-fields.adoc[]

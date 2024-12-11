@@ -21,6 +21,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import dododocs.dododocs.analyze.domain.RepoAnalyze;
 import dododocs.dododocs.analyze.dto.DownloadAiAnalyzeRequest;
+import dododocs.dododocs.chatbot.dto.FindMemberInfoResponse;
 import dododocs.dododocs.config.ControllerTestConfig;
 import dododocs.dododocs.member.domain.Member;
 import dododocs.dododocs.member.dto.FindRegisterMemberRepoResponses;
@@ -99,8 +100,27 @@ public class MemberControllerTest extends ControllerTestConfig {
 
     @DisplayName("멤버의 기본 프로필 정보를 조회하고 상태코드 200을 리턴한다.")
     @Test
-    void findMemberInfoTest() {
+    void findMemberInfoTest() throws Exception {
         given(authService.extractMemberId(anyString())).willReturn(1L);
+        given(memberService.findMemberInfo(anyLong()))
+                .willReturn(new FindMemberInfoResponse("devhaon"));
 
+        // when, then
+        mockMvc.perform(get("/api/member/info")
+                        .header("Authorization", "Bearer aaaaaa.bbbbbb.cccccc")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andDo(document("member/profile/success",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        requestHeaders(
+                                headerWithName("Authorization").description("엑세스 토큰")
+                        ),
+                        responseFields(
+                                fieldWithPath("nickname").description("깃허브 닉네임")
+                        )
+                ))
+                .andExpect(status().isOk());
     }
 }
