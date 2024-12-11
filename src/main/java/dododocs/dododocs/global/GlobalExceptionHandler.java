@@ -1,5 +1,6 @@
 package dododocs.dododocs.global;
 
+import dododocs.dododocs.auth.exception.InvalidTokenException;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +17,15 @@ import org.springframework.web.servlet.resource.NoResourceFoundException;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
     private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+
+    @ExceptionHandler({
+            InvalidTokenException.class
+    })
+    public ResponseEntity<ExceptionResponse> handleUnAuthorizedException(final RuntimeException e) {
+        logger.error(e.getMessage(), e);
+        ExceptionResponse exceptionResponse = new ExceptionResponse(e.getMessage());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(exceptionResponse);
+    }
 
     @ExceptionHandler({
            RuntimeException.class

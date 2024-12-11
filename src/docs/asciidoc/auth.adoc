@@ -38,3 +38,18 @@ include::{snippets}/auth/generate/token/success/http-response.adoc[]
 ===== Response Body
 
 include::{snippets}/auth/generate/token/success/response-fields.adoc[]
+
+
+=== 토큰 만료되었을 때 (로그아웃 해야할 때)
+
+==== HTTP Request
+
+include::{snippets}/auth/logout/success/http-request.adoc[]
+
+==== Request Header
+
+include::{snippets}/auth/logout/success/request-headers.adoc[]
+
+==== HTTP Response
+
+include::{snippets}/auth/logout/success/http-response.adoc[]
