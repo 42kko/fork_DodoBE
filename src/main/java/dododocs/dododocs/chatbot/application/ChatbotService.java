@@ -17,7 +17,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Service
 public class ChatbotService {
-    private final ExternalChatbotClient externalChatbotClient;
+    // private final ExternalChatbotClient externalChatbotClient;
     private final RepoAnalyzeRepository repoAnalyzeRepository;
     private final ChatLogRepository chatLogRepository;
 
@@ -37,7 +37,8 @@ public class ChatbotService {
                 recentChatLogs,
                 false
         );
-        return externalChatbotClient.questToChatbot(questToChatbotRequest);
+        return null;
+       //  return externalChatbotClient.questToChatbot(questToChatbotRequest);
     }
 
     public FindChatLogResponses findChatbotHistory(final long registeredRepoId, final Pageable pageable) {
