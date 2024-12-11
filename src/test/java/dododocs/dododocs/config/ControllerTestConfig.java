@@ -39,7 +39,7 @@ import org.springframework.test.web.servlet.MockMvc;
         AnalyzeController.class,
         ApiTestController.class,
         RepoRegisterController.class,
-        // ChatbotController.class,
+        ChatbotController.class,
 })
 @Import(TestConfig.class)
 @ActiveProfiles("test")
