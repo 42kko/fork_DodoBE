@@ -3,6 +3,7 @@ package dododocs.dododocs.analyze.infrastructure;
 import dododocs.dododocs.analyze.dto.ExternalAiZipAnalyzeRequest;
 import dododocs.dododocs.analyze.dto.ExternalAiZipAnalyzeResponse;
 import dododocs.dododocs.auth.exception.NoExistMemberException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
