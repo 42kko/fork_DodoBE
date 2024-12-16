@@ -11,6 +11,7 @@ import dododocs.dododocs.analyze.dto.ExternalAiZipAnalyzeResponse;
 import dododocs.dododocs.analyze.dto.RepositoryContentDto;
 import dododocs.dododocs.analyze.dto.UploadGitRepoContentToS3Request;
 import dododocs.dododocs.analyze.exception.MaxSizeRepoRegiserException;
+import dododocs.dododocs.analyze.exception.NoExistGitRepoException;
 import dododocs.dododocs.analyze.infrastructure.ExternalAiZipAnalyzeClient;
 import dododocs.dododocs.auth.domain.repository.MemberRepository;
 import dododocs.dododocs.auth.exception.NoExistMemberException;
@@ -40,8 +41,6 @@ import java.util.zip.ZipOutputStream;
 @Service
 public class AnalyzeService {
     private static final Integer REPO_REGISTER_MAX_SIZE = 3;
-    private final ObjectMapper objectMapper = new ObjectMapper();
-    private final RestTemplate restTemplate;
     private final ExternalAiZipAnalyzeClient externalAiZipAnalyzeClient;
     private final MemberRepository memberRepository;
     private final AmazonS3Client amazonS3Client;
@@ -66,6 +65,7 @@ public class AnalyzeService {
 
         // 개인 소유자로 먼저 시도
         String ownerName = member.getOriginName();
+
         boolean success = tryUploadFromOwner(ownerName, repoName, branchName);
 
         // 개인 소유에서 찾지 못하면 조직 소유로 검색
@@ -74,9 +74,14 @@ public class AnalyzeService {
             for (String orgName : organizationNames) {
                 success = tryUploadFromOwner(orgName, repoName, branchName);
                 if (success) {
+                    ownerName = orgName;
                     break;
                 }
             }
+        }
+
+        if(!success) {
+            throw new NoExistGitRepoException("존재하지 않는 레포지토리 또는 브랜치입니다.");
         }
 
         String s3Key = ownerName + "-" + repoName;
@@ -105,49 +110,6 @@ public class AnalyzeService {
         );
     }
 
-    /*
-        List<String> readmeBlocks = new ArrayList<>();
-
-        if(uploadGitRepoContentToS3Request.isPreviewBlock()) {
-            readmeBlocks.add("PREVIEW_BLOCK");
-        }
-
-        if(uploadGitRepoContentToS3Request.isAnalysisBlock()) {
-            readmeBlocks.add("ANALYSIS_BLOCK");
-        }
-
-        if(uploadGitRepoContentToS3Request.isStructureBlock()) {
-            readmeBlocks.add("STRUCTURE_BLOCK");
-        }
-
-        if(uploadGitRepoContentToS3Request.isStartBlock()) {
-            readmeBlocks.add("START_BLOCK");
-        }
-
-        if(uploadGitRepoContentToS3Request.isMotivationBlock()) {
-            readmeBlocks.add("MOTIVATION_BLOCK");
-        }
-
-        if(uploadGitRepoContentToS3Request.isDemoBlock()) {
-            readmeBlocks.add("DEMO_BLOCK");
-        }
-
-        if(uploadGitRepoContentToS3Request.isDeploymentBlock()) {
-            readmeBlocks.add("DEPLOYMENT_BLOCK");
-        }
-
-        if(uploadGitRepoContentToS3Request.isContributorsBlock()) {
-            readmeBlocks.add("CONTRIBUTORS_BLOCK");
-        }
-
-        if(uploadGitRepoContentToS3Request.isFaqBlock()) {
-            readmeBlocks.add("FAQ_BLOCK");
-        }
-
-        if(uploadGitRepoContentToS3Request.isPerformanceBlock()) {
-            readmeBlocks.add("PERFORMANCE_BLOCK");
-        } */
-
     // 특정 소유자(개인 또는 조직)에서 레포지토리를 찾아 업로드 시도
     private boolean tryUploadFromOwner(String ownerName, String repoName, String branchName) {
         String bucketDetailName = ownerName + "-" + repoName;
@@ -164,17 +126,22 @@ public class AnalyzeService {
             System.out.println("===================");
             System.out.println(e.getMessage());
             System.out.println("===================");
-            System.out.println(e.getCause());
+            // throw new NoExistGitRepoException("존재하지 않는 레포지토리 또는 브랜치입니다.");
+            return false;
         }
+
         // S3에 업로드
         try {
+            System.out.println("qweqweqweq-wep-=qw-=peqw-=eqwp-=ep-q=wep-=qwep=-qwe=p-qwep=-qwp=-e");
             amazonS3Client.putObject("haon-dododocs", bucketDetailName, tempFile);
+            System.out.println("wqjejqiweiqwoeiqjwoijoiqwejoiqweoijqowie");
         } catch (Exception e) {
             System.out.println("s3 에 업로드하다가 애러터짐");
             System.out.println("===================");
             System.out.println(e.getMessage());
             System.out.println("===================");
             System.out.println(e.getCause());
+            return false;
         }
 
         // 업로드 후 임시 파일 삭제

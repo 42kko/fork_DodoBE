@@ -91,8 +91,7 @@ public class MemberControllerTest extends ControllerTestConfig {
                                 fieldWithPath("findRegisterRepoResponses[]").description("등록한 레포지토리 리스트"),
                                 fieldWithPath("findRegisterRepoResponses[].repositoryName").description("레포 이름"),
                                 fieldWithPath("findRegisterRepoResponses[].branchName").description("레포 브랜치 명"),
-                                fieldWithPath("findRegisterRepoResponses[].createdAt").description("레포 등록날짜"),
-                                fieldWithPath("findRegisterRepoResponses[].progressState").description("레포 등록 진행상태(진행률)")
+                                fieldWithPath("findRegisterRepoResponses[].createdAt").description("레포 등록날짜")
                         )
                 ))
                 .andExpect(status().isOk());

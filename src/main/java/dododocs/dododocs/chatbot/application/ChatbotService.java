@@ -37,7 +37,10 @@ public class ChatbotService {
                 recentChatLogs,
                 false
         );
-        return externalChatbotClient.questToChatbot(questToChatbotRequest);
+
+        final ExternalQuestToChatbotResponse externalQuestToChatbotResponse = externalChatbotClient.questToChatbot(questToChatbotRequest);
+        chatLogRepository.save(new ChatLog(question, externalQuestToChatbotResponse.getAnswer(), repoAnalyze));
+        return externalQuestToChatbotResponse;
     }
 
     public FindChatLogResponses findChatbotHistory(final long registeredRepoId, final Pageable pageable) {

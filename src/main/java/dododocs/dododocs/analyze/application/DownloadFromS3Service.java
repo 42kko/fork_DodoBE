@@ -4,6 +4,7 @@ import com.amazonaws.services.s3.AmazonS3Client;
 import dododocs.dododocs.analyze.domain.RepoAnalyze;
 import dododocs.dododocs.analyze.domain.repository.RepoAnalyzeRepository;
 import dododocs.dododocs.analyze.dto.DownloadAiAnalyzeResponse;
+import dododocs.dododocs.analyze.dto.DownloadReadmeAnalyzeResponse;
 import dododocs.dododocs.analyze.exception.NoExistRepoAnalyzeException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -24,8 +25,8 @@ public class DownloadFromS3Service {
     private final AmazonS3Client amazonS3Client;
     private final String bucketName = "haon-dododocs";
 
-    public DownloadAiAnalyzeResponse downloadAndProcessZip(final String repoName) throws IOException {
-        final RepoAnalyze repoAnalyze = repoAnalyzeRepository.findByRepositoryName(repoName)
+    public DownloadAiAnalyzeResponse downloadAndProcessZipDocsInfo(final long registeredRepoId) throws IOException {
+        final RepoAnalyze repoAnalyze = repoAnalyzeRepository.findById(registeredRepoId)
                 .orElseThrow(() -> new NoExistRepoAnalyzeException("레포지토리 정보가 존재하지 않습니다."));
 
         final String s3Key = repoAnalyze.getDocsKey();
@@ -48,6 +49,11 @@ public class DownloadFromS3Service {
 
     private File downloadZipFromS3(String bucketName, String s3Key) throws IOException {
         File tempZipFile = File.createTempFile("s3-download", ".zip");
+
+        System.out.println("===============================================");
+        System.out.println("bucketName:" + bucketName);
+        System.out.println("s3key:" + s3Key);
+        System.out.println("===============================================");
 
         try (InputStream inputStream = amazonS3Client.getObject(bucketName, s3Key).getObjectContent();
              FileOutputStream outputStream = new FileOutputStream(tempZipFile)) {
@@ -239,5 +245,68 @@ public class DownloadFromS3Service {
 
     private void uploadZipToS3(String bucketName, String s3Key, File zipFile) {
         amazonS3Client.putObject(bucketName, s3Key, zipFile);
+    }
+
+    public DownloadAiAnalyzeResponse downloadAndProcessZipReadmeInfoByRepoName(final long repoId) throws IOException {
+        final RepoAnalyze repoAnalyze = repoAnalyzeRepository.findById(repoId)
+                .orElseThrow(() -> new NoExistRepoAnalyzeException("레포지토리 정보가 존재하지 않습니다."));
+
+        System.out.println("========================123123123123 🔥");
+        System.out.println(repoAnalyze.getBranchName());
+        System.out.println(repoAnalyze.getRepoUrl());
+        System.out.println(repoAnalyze.getReadMeKey());
+        System.out.println(repoAnalyze.getRepositoryName());
+        System.out.println("========================123123123123 🔥");
+
+        final String s3Key = repoAnalyze.getDocsKey();
+
+        // 1. S3에서 ZIP 파일 다운로드
+        File zipFile = downloadZipFromS3(bucketName, s3Key);
+
+        // 2. ZIP 파일 압축 해제
+        File extractedDir = unzipFile(zipFile);
+
+        // 3. .md 파일을 FileDetail 형식으로 변환하여 분류
+        Map<String, List<DownloadAiAnalyzeResponse.FileDetail>> categorizedFiles = collectAndCategorizeMarkdownFiles(extractedDir);
+
+        // 4. 임시 파일 삭제
+        zipFile.delete();
+        deleteDirectory(extractedDir);
+
+        return new DownloadAiAnalyzeResponse(categorizedFiles.get("summary"), categorizedFiles.get("regular"));
+    }
+
+
+    public DownloadReadmeAnalyzeResponse downloadAndProcessZipReadmeInfo(final long repoRegisterId) throws IOException {
+        // 1. 레포지토리 정보 확인
+        RepoAnalyze repoAnalyze = repoAnalyzeRepository.findById(repoRegisterId)
+                .orElseThrow(() -> new NoExistRepoAnalyzeException("레포지토리 정보가 존재하지 않습니다."));
+
+        // 2. readMeKey 가져오기
+        String readMeKey = repoAnalyze.getReadMeKey();
+        if (readMeKey == null || readMeKey.isEmpty()) {
+            throw new NoExistRepoAnalyzeException("readMeKey가 존재하지 않습니다.");
+        }
+
+        // 3. S3에서 파일 다운로드
+        String readMeContent = downloadFileFromS3(bucketName, readMeKey);
+
+        // 4. 결과 반환
+        return new DownloadReadmeAnalyzeResponse(readMeContent);
+    }
+
+    private String downloadFileFromS3(String bucketName, String s3Key) throws IOException {
+        try (InputStream inputStream = amazonS3Client.getObject(bucketName, s3Key).getObjectContent();
+             BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
+
+            StringBuilder content = new StringBuilder();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                content.append(line).append(System.lineSeparator());
+            }
+            return content.toString();
+        } catch (Exception e) {
+            throw new NoExistRepoAnalyzeException("레포지토리 결과물을 아직 생성중입니다. 잠시만 기다려주세요.");
+        }
     }
 }

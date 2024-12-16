@@ -4,12 +4,10 @@ package dododocs.dododocs.analyze.presentation;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dododocs.dododocs.analyze.application.AnalyzeService;
-import dododocs.dododocs.analyze.dto.FindGitRepoContentRequest;
-import dododocs.dododocs.analyze.dto.FindRepoContentResponses;
-import dododocs.dododocs.analyze.dto.RepositoryContentDto;
-import dododocs.dododocs.analyze.dto.UploadGitRepoContentToS3Request;
+import dododocs.dododocs.analyze.dto.*;
 import dododocs.dododocs.auth.dto.Accessor;
 import dododocs.dododocs.auth.presentation.authentication.Authentication;
+import org.hibernate.sql.Update;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
@@ -49,10 +47,13 @@ public class AnalyzeController {
         analyzeService.uploadGithubRepoToS3(uploadToS3Request, accessor.getId());
     }
 
-    @PutMapping("/readme/update")
-    public void updateReadmeContents() {
-
-    }
+    /* @PutMapping("/docs/update/{registeredRepoId}")
+    public ResponseEntity<Void> updateDocsContents(@Authentication final Accessor accessor,
+                                                     @PathVariable final Long registeredRepoId,
+                                                     @RequestBody final UpdateDocsRequest updateDocsRequest) throws Exception {
+        analyzeService.updateDocsContents(updateDocsRequest.getFileName());
+        return ResponseEntity.noContent().build();
+    } */
 
 
     @GetMapping("/repo/contents")

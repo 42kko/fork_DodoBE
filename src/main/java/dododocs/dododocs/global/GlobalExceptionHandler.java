@@ -1,5 +1,7 @@
 package dododocs.dododocs.global;
 
+import dododocs.dododocs.analyze.exception.NoExistGitRepoException;
+import dododocs.dododocs.analyze.exception.NoExistRepoAnalyzeException;
 import dododocs.dododocs.auth.exception.InvalidTokenException;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
@@ -19,6 +21,16 @@ public class GlobalExceptionHandler {
     private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     @ExceptionHandler({
+            NoExistGitRepoException.class,
+            NoExistRepoAnalyzeException.class,
+    })
+    public ResponseEntity<ExceptionResponse> handleNotFoundException(final RuntimeException e) {
+        logger.error(e.getMessage(), e);
+        ExceptionResponse exceptionResponse = new ExceptionResponse(e.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exceptionResponse);
+    }
+
+    @ExceptionHandler({
             InvalidTokenException.class
     })
     public ResponseEntity<ExceptionResponse> handleUnAuthorizedException(final RuntimeException e) {
@@ -35,6 +47,8 @@ public class GlobalExceptionHandler {
         ExceptionResponse exceptionResponse = new ExceptionResponse(e.getMessage());
         return ResponseEntity.badRequest().body(exceptionResponse);
     }
+
+
     @ExceptionHandler({
             NoResourceFoundException.class
     })

@@ -16,7 +16,7 @@ public class ChatLog {
     @Column(name = "question")
     private String question;
 
-    @Column(name = "answer")
+    @Column(name = "answer", length = 8000)
     private String answer;
 
     @Column(name = "sequence")

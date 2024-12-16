@@ -1,5 +1,7 @@
 package dododocs.dododocs.chatbot.infrastructure;
 
+import dododocs.dododocs.analyze.exception.NoExistGitRepoException;
+import dododocs.dododocs.analyze.exception.NoExistRepoAnalyzeException;
 import dododocs.dododocs.chatbot.dto.ExternalQuestToChatbotRequest;
 import dododocs.dododocs.chatbot.dto.ExternalQuestToChatbotResponse;
 import org.springframework.beans.factory.annotation.Value;
@@ -7,6 +9,8 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpServerErrorException;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.HashMap;
@@ -29,17 +33,25 @@ public class ExternalChatbotClient {
     }
 
     private ExternalQuestToChatbotResponse requestQuestion(final ExternalQuestToChatbotRequest questToChatbotRequest) {
-        final Map<String, String> urlVariables = new HashMap<>();
+        try {
+            final Map<String, String> urlVariables = new HashMap<>();
 
-        final ResponseEntity<ExternalQuestToChatbotResponse> responseEntity = restTemplate.exchange(
-                aiBasicUrl + CHATBOT_QUESTION_REQUEST_URL_PREFIX,
-                HttpMethod.POST,
-                new HttpEntity<>(questToChatbotRequest),
-                ExternalQuestToChatbotResponse.class,
-                urlVariables
-        );
+            final ResponseEntity<ExternalQuestToChatbotResponse> responseEntity = restTemplate.exchange(
+                    aiBasicUrl + CHATBOT_QUESTION_REQUEST_URL_PREFIX,
+                    HttpMethod.POST,
+                    new HttpEntity<>(questToChatbotRequest),
+                    ExternalQuestToChatbotResponse.class,
+                    urlVariables
+            );
 
-        return responseEntity.getBody();
+            return responseEntity.getBody();
+        } catch (final HttpServerErrorException e) {
+            // 상태 코드 500 (서버 오류) 처리
+            throw new NoExistRepoAnalyzeException("레포지토리 결과물을 아직 생성중입니다. 잠시만 기다려주세요.");
+        } catch (final RestClientException e) {
+            // 그 외 RestTemplate 관련 예외 처리
+            throw new NoExistGitRepoException("레포지토리 결과물을 아직 생성중입니다. 잠시만 기다려주세요.");
+        }
     }
 }
 

@@ -7,6 +7,7 @@ import lombok.Getter;
 public class RegisteredRepoResponse {
     private long registeredRepoId;
     private String repositoryName;
+    private String branchName;
 
     private RegisteredRepoResponse() {
     }
@@ -14,5 +15,6 @@ public class RegisteredRepoResponse {
     public RegisteredRepoResponse(final RepoAnalyze repoAnalyze) {
         this.registeredRepoId = repoAnalyze.getId();
         this.repositoryName = repoAnalyze.getRepositoryName();
+        this.branchName = repoAnalyze.getBranchName();
     }
 }

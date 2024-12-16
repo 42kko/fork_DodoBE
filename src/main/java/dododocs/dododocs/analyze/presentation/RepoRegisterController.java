@@ -15,11 +15,6 @@ import org.springframework.web.bind.annotation.*;
 public class RepoRegisterController {
     private final RepoRegisterService repoRegisterService;
 
-    @GetMapping
-    public FindRepoRegisterResponses findRegisteredRepos(@Authentication final Accessor accessor) {
-        return repoRegisterService.findRegisteredRepos(accessor.getId());
-    }
-
     @DeleteMapping
     public ResponseEntity<Void> deleteRegisteredRepos(@Authentication final Accessor accessor,
                                                 final @RequestBody DeleteRepoRegisterRequest deleteRepoRegisterRequest) {

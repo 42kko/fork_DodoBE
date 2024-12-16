@@ -451,22 +451,25 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <ul class="sectlevel2">
 <li><a href="#_oauth_로그인_링크_생성_api">OAuth 로그인 링크 생성 API</a></li>
 <li><a href="#_oauth_소셜_로그인_api">OAuth 소셜 로그인 API</a></li>
+<li><a href="#_토큰_만료되었을_때_로그아웃_해야할_때">토큰 만료되었을 때 (로그아웃 해야할 때)</a></li>
 </ul>
 </li>
 <li><a href="#_️_member_멤버">⛳️ Member (멤버)</a>
 <ul class="sectlevel2">
 <li><a href="#_멤버의_깃허브_레포지토리_이름_리스트_조회">멤버의 깃허브 레포지토리 이름 리스트 조회</a></li>
-<li><a href="#_멤버가_등록한_레포지토리_리스트_조회">멤버가 등록한 레포지토리 리스트 조회</a></li>
 <li><a href="#_멤버_기본_프로필_정보_조회">멤버 기본 프로필 정보 조회</a></li>
 </ul>
 </li>
 <li><a href="#_️_ai_문서화">⛳️ AI 문서화</a>
 <ul class="sectlevel2">
 <li><a href="#_ai_분석_및_문서화_요청_레포_등록">AI 분석 및 문서화 요청 (레포 등록)</a></li>
-<li><a href="#_ai_분석_및_문서화_결과_불러오기">AI 분석 및 문서화 결과 불러오기</a></li>
-<li><a href="#_등록된_레포지토리_리스트_조회">등록된 레포지토리 리스트 조회</a></li>
+<li><a href="#_레포지토리_등록_실패_존재하지_않는_잘못된_깃허브_레포지토리_url_이나_브랜치명을_입력_받았을_때">레포지토리 등록 실패 (존재하지 않는 (잘못된) 깃허브 레포지토리 URL 이나 브랜치명을 입력 받았을 때)</a></li>
+<li><a href="#_ai_분석_docs_결과_불러오기">AI 분석 DOCS 결과 불러오기</a></li>
+<li><a href="#_ai_분석_readme_결과_불러오기">AI 분석 README 결과 불러오기</a></li>
+<li><a href="#_ai_분석_docs_또는_readme_챗봇_질문하기_등_결과_불러오기_실패_아직_ai_가_document_생성을_완료하지_못한_경우">AI 분석 DOCS (또는 README, 챗봇 질문하기 등) 결과 불러오기 실패 (아직 AI 가 Document 생성을 완료하지 못한 경우)</a></li>
+<li><a href="#_멤버가_등록한_레포지토리_리스트_조회">멤버가 등록한 레포지토리 리스트 조회</a></li>
 <li><a href="#_등록된_레포지토리_삭제">등록된 레포지토리 삭제</a></li>
-<li><a href="#_레포에서_특정_파일명_입력했을_때_그에_대한_리드미_내용을_제공_api">레포에서 특정 파일명 입력했을 때, 그에 대한 리드미 내용을 제공 API</a></li>
+<li><a href="#_레포에서_특정_파일명을_입력했을_때_그에_대한_리드미_내용을_제공하는_api">레포에서 특정 파일명을 입력했을 때, 그에 대한 리드미 내용을 제공하는 API</a></li>
 <li><a href="#_리드미_내용_수정_api">리드미 내용 수정 API</a></li>
 </ul>
 </li>
@@ -627,6 +630,57 @@ Content-Length: 51
 </div>
 </div>
 </div>
+<div class="sect2">
+<h3 id="_토큰_만료되었을_때_로그아웃_해야할_때">토큰 만료되었을 때 (로그아웃 해야할 때)</h3>
+<div class="sect3">
+<h4 id="_http_request_3">HTTP Request</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">GET /api/auth/link HTTP/1.1
+Authorization: Bearer aaaaaa.bbbbbb.cccccc
+Host: localhost:8080</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_request_header">Request Header</h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Name</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Authorization</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">엑세스 토큰</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_http_response_3">HTTP Response</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 401 Unauthorized
+Vary: Origin
+Vary: Access-Control-Request-Method
+Vary: Access-Control-Request-Headers
+Content-Type: application/json
+Content-Length: 66
+
+{
+  "message" : "변조되었거나 만료된 토큰 입니다."
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
 </div>
 </div>
 <div class="sect1">
@@ -635,7 +689,7 @@ Content-Length: 51
 <div class="sect2">
 <h3 id="_멤버의_깃허브_레포지토리_이름_리스트_조회">멤버의 깃허브 레포지토리 이름 리스트 조회</h3>
 <div class="sect3">
-<h4 id="_http_request_3">HTTP Request</h4>
+<h4 id="_http_request_4">HTTP Request</h4>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">GET /api/member/repos/all HTTP/1.1
@@ -646,7 +700,7 @@ Host: localhost:8080</code></pre>
 </div>
 </div>
 <div class="sect4">
-<h5 id="_request_header">Request Header</h5>
+<h5 id="_request_header_2">Request Header</h5>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 50%;">
@@ -676,7 +730,7 @@ Host: localhost:8080</code></pre>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_http_response_3">HTTP Response</h4>
+<h4 id="_http_response_4">HTTP Response</h4>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
@@ -715,118 +769,6 @@ Content-Length: 60
 </tbody>
 </table>
 </div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_멤버가_등록한_레포지토리_리스트_조회">멤버가 등록한 레포지토리 리스트 조회</h3>
-<div class="sect3">
-<h4 id="_http_request_4">HTTP Request</h4>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">GET /api/member/repos/registered HTTP/1.1
-Content-Type: application/json;charset=UTF-8
-Authorization: Bearer aaaaaa.bbbbbb.cccccc
-Accept: application/json
-Host: localhost:8080</code></pre>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_request_header_2">Request Header</h4>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Name</th>
-<th class="tableblock halign-left valign-top">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Authorization</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">엑세스 토큰</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="sect3">
-<h4 id="_http_response_4">HTTP Response</h4>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
-Content-Type: application/json
-Content-Length: 399
-
-{
-  "findRegisterRepoResponses" : [ {
-    "repositoryName" : "dododocs",
-    "branchName" : "main",
-    "createdAt" : null,
-    "progressState" : 100
-  }, {
-    "repositoryName" : "repo-name2",
-    "branchName" : "main",
-    "createdAt" : null,
-    "progressState" : 100
-  }, {
-    "repositoryName" : "repo-name3",
-    "branchName" : "main",
-    "createdAt" : null,
-    "progressState" : 100
-  } ]
-}</code></pre>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_response_field">Response Field</h4>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 33.3333%;">
-<col style="width: 33.3333%;">
-<col style="width: 33.3334%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Path</th>
-<th class="tableblock halign-left valign-top">Type</th>
-<th class="tableblock halign-left valign-top">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>findRegisterRepoResponses[]</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Array</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">등록한 레포지토리 리스트</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>findRegisterRepoResponses[].repositoryName</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">레포 이름</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>findRegisterRepoResponses[].branchName</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">레포 브랜치 명</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>findRegisterRepoResponses[].createdAt</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Null</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">레포 등록날짜</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>findRegisterRepoResponses[].progressState</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">레포 등록 진행상태(진행률)</p></td>
-</tr>
-</tbody>
-</table>
 </div>
 </div>
 <div class="sect2">
@@ -1000,12 +942,91 @@ Vary: Access-Control-Request-Headers</code></pre>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_ai_분석_및_문서화_결과_불러오기">AI 분석 및 문서화 결과 불러오기</h3>
+<h3 id="_레포지토리_등록_실패_존재하지_않는_잘못된_깃허브_레포지토리_url_이나_브랜치명을_입력_받았을_때">레포지토리 등록 실패 (존재하지 않는 (잘못된) 깃허브 레포지토리 URL 이나 브랜치명을 입력 받았을 때)</h3>
 <div class="sect3">
 <h4 id="_http_request_7">HTTP Request</h4>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">POST /api/download/s3?repositoryName=dododocs HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">POST /api/upload/s3 HTTP/1.1
+Content-Type: application/json;charset=UTF-8
+Authorization: Bearer aaaaaa.bbbbbb.cccccc
+Accept: application/json
+Content-Length: 119
+Host: localhost:8080
+
+{
+  "repositoryName" : "Invalid-Git-Repo-Name",
+  "branchName" : "main222",
+  "korean" : true,
+  "includeTest" : true
+}</code></pre>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_request_body_4">Request Body</h5>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Path</th>
+<th class="tableblock halign-left valign-top">Type</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>repositoryName</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">분석 할 레포지토리 이름 (ex. Gatsby-Starter-Haon)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>branchName</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">브랜치 명 (ex. main)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>korean</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Boolean</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">한국어 번역 여부</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>includeTest</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Boolean</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">테스트 포함 여부</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_http_response_7">HTTP Response</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 404 Not Found
+Vary: Origin
+Vary: Access-Control-Request-Method
+Vary: Access-Control-Request-Headers
+Content-Type: application/json
+Content-Length: 82
+
+{
+  "message" : "존재하지 않는 레포지토리 또는 브랜치입니다."
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_ai_분석_docs_결과_불러오기">AI 분석 DOCS 결과 불러오기</h3>
+<div class="sect3">
+<h4 id="_http_request_8">HTTP Request</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">POST /api/download/docs/1 HTTP/1.1
 Content-Type: application/json;charset=UTF-8
 Authorization: Bearer aaaaaa.bbbbbb.cccccc
 Accept: application/json
@@ -1014,8 +1035,9 @@ Host: localhost:8080</code></pre>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_request_param">Request Param</h4>
+<h4 id="_path_variable">Path Variable</h4>
 <table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 1. /api/download/docs/{registeredRepoId}</caption>
 <colgroup>
 <col style="width: 50%;">
 <col style="width: 50%;">
@@ -1028,14 +1050,14 @@ Host: localhost:8080</code></pre>
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>repositoryName</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">다운로드 받을 레포명</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>registeredRepoId</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">등록된 레포지토리 정보 고유 ID 값</p></td>
 </tr>
 </tbody>
 </table>
 </div>
 <div class="sect3">
-<h4 id="_http_response_7">HTTP Response</h4>
+<h4 id="_http_response_8">HTTP Response</h4>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
@@ -1118,12 +1140,144 @@ Content-Length: 481
 </div>
 </div>
 <div class="sect2">
-<h3 id="_등록된_레포지토리_리스트_조회">등록된 레포지토리 리스트 조회</h3>
+<h3 id="_ai_분석_readme_결과_불러오기">AI 분석 README 결과 불러오기</h3>
 <div class="sect3">
-<h4 id="_http_request_8">HTTP Request</h4>
+<h4 id="_http_request_9">HTTP Request</h4>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">GET /api/register HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">POST /api/download/readme/1 HTTP/1.1
+Content-Type: application/json;charset=UTF-8
+Authorization: Bearer aaaaaa.bbbbbb.cccccc
+Accept: application/json
+Host: localhost:8080</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_path_variable_2">Path Variable</h4>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 2. /api/download/readme/{registeredRepoId}</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Parameter</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>registeredRepoId</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">등록된 레포지토리 정보 고유 ID 값</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_http_response_9">HTTP Response</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
+Vary: Origin
+Vary: Access-Control-Request-Method
+Vary: Access-Control-Request-Headers
+Content-Type: application/json
+Content-Length: 57
+
+{
+  "contents" : "AI 분석 결과 리드미 내용물"
+}</code></pre>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_response_body_5">Response Body</h5>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Path</th>
+<th class="tableblock halign-left valign-top">Type</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>contents</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">리드미 내용</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_ai_분석_docs_또는_readme_챗봇_질문하기_등_결과_불러오기_실패_아직_ai_가_document_생성을_완료하지_못한_경우">AI 분석 DOCS (또는 README, 챗봇 질문하기 등) 결과 불러오기 실패 (아직 AI 가 Document 생성을 완료하지 못한 경우)</h3>
+<div class="sect3">
+<h4 id="_http_request_10">HTTP Request</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">POST /api/download/docs/1 HTTP/1.1
+Content-Type: application/json;charset=UTF-8
+Authorization: Bearer aaaaaa.bbbbbb.cccccc
+Accept: application/json
+Host: localhost:8080</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_path_variable_3">Path Variable</h4>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 3. /api/download/docs/{registeredRepoId}</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Parameter</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>registeredRepoId</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">등록된 레포지토리 정보 고유 ID 값</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_http_response_10">HTTP Response</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 404 Not Found
+Vary: Origin
+Vary: Access-Control-Request-Method
+Vary: Access-Control-Request-Headers
+Content-Type: application/json
+Content-Length: 105
+
+{
+  "message" : "레포지토리 결과물을 아직 생성중입니다. 잠시만 기다려주세요."
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_멤버가_등록한_레포지토리_리스트_조회">멤버가 등록한 레포지토리 리스트 조회</h3>
+<div class="sect3">
+<h4 id="_http_request_11">HTTP Request</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">GET /api/member/repos/registered HTTP/1.1
 Content-Type: application/json;charset=UTF-8
 Authorization: Bearer aaaaaa.bbbbbb.cccccc
 Accept: application/json
@@ -1153,7 +1307,7 @@ Host: localhost:8080</code></pre>
 </table>
 </div>
 <div class="sect3">
-<h4 id="_http_response_8">HTTP Response</h4>
+<h4 id="_http_response_11">HTTP Response</h4>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
@@ -1161,22 +1315,28 @@ Vary: Origin
 Vary: Access-Control-Request-Method
 Vary: Access-Control-Request-Headers
 Content-Type: application/json
-Content-Length: 187
+Content-Length: 361
 
 {
-  "registeredRepoResponses" : [ {
-    "registeredRepoId" : 1,
-    "repositoryName" : "Gatsby-Starter-Haon"
+  "findRegisterRepoResponses" : [ {
+    "repositoryName" : "dododocs",
+    "branchName" : "main",
+    "createdAt" : "2024-12-16"
   }, {
-    "registeredRepoId" : 2,
-    "repositoryName" : "repo2-name"
+    "repositoryName" : "repo-name2",
+    "branchName" : "develop",
+    "createdAt" : "2024-12-16"
+  }, {
+    "repositoryName" : "repo-name3",
+    "branchName" : "feature/social-login",
+    "createdAt" : "2024-12-16"
   } ]
 }</code></pre>
 </div>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_response_body_5">Response Body</h4>
+<h4 id="_response_field">Response Field</h4>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 33.3333%;">
@@ -1192,19 +1352,24 @@ Content-Length: 187
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>registeredRepoResponses[]</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>findRegisterRepoResponses[]</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>Array</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">등록된 레포 리스트</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">등록한 레포지토리 리스트</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>registeredRepoResponses[].registeredRepoId</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">레포 고유 ID 값</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>registeredRepoResponses[].repositoryName</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>findRegisterRepoResponses[].repositoryName</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">레포 이름</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>findRegisterRepoResponses[].branchName</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">레포 브랜치 명</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>findRegisterRepoResponses[].createdAt</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">레포 등록날짜</p></td>
 </tr>
 </tbody>
 </table>
@@ -1213,7 +1378,7 @@ Content-Length: 187
 <div class="sect2">
 <h3 id="_등록된_레포지토리_삭제">등록된 레포지토리 삭제</h3>
 <div class="sect3">
-<h4 id="_http_request_9">HTTP Request</h4>
+<h4 id="_http_request_12">HTTP Request</h4>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">DELETE /api/register HTTP/1.1
@@ -1250,7 +1415,7 @@ Host: localhost:8080
 </table>
 </div>
 <div class="sect4">
-<h5 id="_request_body_4">Request Body</h5>
+<h5 id="_request_body_5">Request Body</h5>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 33.3333%;">
@@ -1275,7 +1440,7 @@ Host: localhost:8080
 </div>
 </div>
 <div class="sect3">
-<h4 id="_http_response_9">HTTP Response</h4>
+<h4 id="_http_response_12">HTTP Response</h4>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 204 No Content
@@ -1287,12 +1452,12 @@ Vary: Access-Control-Request-Headers</code></pre>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_레포에서_특정_파일명_입력했을_때_그에_대한_리드미_내용을_제공_api">레포에서 특정 파일명 입력했을 때, 그에 대한 리드미 내용을 제공 API</h3>
+<h3 id="_레포에서_특정_파일명을_입력했을_때_그에_대한_리드미_내용을_제공하는_api">레포에서 특정 파일명을 입력했을 때, 그에 대한 리드미 내용을 제공하는 API</h3>
 <div class="sect3">
-<h4 id="_http_request_10">HTTP Request</h4>
+<h4 id="_http_request_13">HTTP Request</h4>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">GET /api/download/s3/detail?repositoryName=my-repo&amp;fileName=Controller_Summary.md HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">GET /api/download/s3/detail/1?fileName=Controller_Summary.md HTTP/1.1
 Content-Type: application/json;charset=UTF-8
 Authorization: Bearer aaaaaa.bbbbbb.cccccc
 Accept: application/json
@@ -1335,10 +1500,6 @@ Host: localhost:8080</code></pre>
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>repositoryName</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">조회할 레포 이름</p></td>
-</tr>
-<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>fileName</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">조회할 파일 이름</p></td>
 </tr>
@@ -1347,7 +1508,7 @@ Host: localhost:8080</code></pre>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_http_response_10">HTTP Response</h4>
+<h4 id="_http_response_13">HTTP Response</h4>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
@@ -1397,7 +1558,7 @@ Content-Length: 98
 <div class="sect2">
 <h3 id="_리드미_내용_수정_api">리드미 내용 수정 API</h3>
 <div class="sect3">
-<h4 id="_http_request_11">HTTP Request</h4>
+<h4 id="_http_request_14">HTTP Request</h4>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">PUT /api/readme?repositoryName=dododocs&amp;fileName=Controller_Summary.md&amp;newContent=new%20contents~~ HTTP/1.1
@@ -1408,7 +1569,7 @@ Host: localhost:8080</code></pre>
 </div>
 </div>
 <div class="sect4">
-<h5 id="_request_param_2">Request Param</h5>
+<h5 id="_request_param">Request Param</h5>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 50%;">
@@ -1438,7 +1599,7 @@ Host: localhost:8080</code></pre>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_http_response_11">HTTP Response</h4>
+<h4 id="_http_response_14">HTTP Response</h4>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 204 No Content
@@ -1457,7 +1618,7 @@ Vary: Access-Control-Request-Headers</code></pre>
 <div class="sect2">
 <h3 id="_챗봇_대화_내역_불러오기">챗봇 대화 내역 불러오기</h3>
 <div class="sect3">
-<h4 id="_http_request_12">HTTP Request</h4>
+<h4 id="_http_request_15">HTTP Request</h4>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">GET /api/chatbot/logs/1 HTTP/1.1
@@ -1490,7 +1651,7 @@ Host: localhost:8080</code></pre>
 </table>
 </div>
 <div class="sect3">
-<h4 id="_http_response_12">HTTP Response</h4>
+<h4 id="_http_response_15">HTTP Response</h4>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
@@ -1519,7 +1680,7 @@ Content-Length: 213
 <div class="sect2">
 <h3 id="_챗봇에게_질문하기">챗봇에게 질문하기</h3>
 <div class="sect3">
-<h4 id="_http_request_13">HTTP Request</h4>
+<h4 id="_http_request_16">HTTP Request</h4>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">POST /api/chatbot/question/save/1 HTTP/1.1
@@ -1556,7 +1717,7 @@ Host: localhost:8080
 </table>
 </div>
 <div class="sect4">
-<h5 id="_request_body_5">Request Body</h5>
+<h5 id="_request_body_6">Request Body</h5>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 33.3333%;">
@@ -1581,7 +1742,7 @@ Host: localhost:8080
 </div>
 </div>
 <div class="sect3">
-<h4 id="_http_response_13">HTTP Response</h4>
+<h4 id="_http_response_16">HTTP Response</h4>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
@@ -1630,7 +1791,7 @@ Content-Length: 33
 <div class="sect2">
 <h3 id="_ai_readme_분석_결과_조회_테스트_api">AI README 분석 결과 조회 테스트 API</h3>
 <div class="sect3">
-<h4 id="_http_request_14">HTTP Request</h4>
+<h4 id="_http_request_17">HTTP Request</h4>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">GET /api/analyze/result?repositoryName=Gatsby-Starter-Haon HTTP/1.1
@@ -1640,7 +1801,7 @@ Host: localhost:8080</code></pre>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_http_response_14">HTTP Response</h4>
+<h4 id="_http_response_17">HTTP Response</h4>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
@@ -1648,16 +1809,16 @@ Vary: Origin
 Vary: Access-Control-Request-Method
 Vary: Access-Control-Request-Headers
 Content-Type: application/json
-Content-Length: 4115
+Content-Length: 11921
 
 {
   "summaryFiles" : [ {
     "fileName" : "kakao-25_moheng.README.md",
-    "fileContents" : "    # Project Name\n    moheng\n\n    ## Table of Contents\n    [ \uD83D\uDCDD Overview](#\uD83D\uDCDD-overview)\n    [ \uD83D\uDCC1 Project Structure](#\uD83D\uDCC1-project-structure)\n    [ \uD83D\uDE80 Getting Started](#\uD83D\uDE80-getting-started)\n    [ \uD83D\uDCA1 Motivation](#\uD83D\uDCA1-motivation)\n    [ \uD83C\uDFAC Demo](#\uD83C\uDFAC-demo)\n    [ \uD83C\uDF10 Deployment](#\uD83C\uDF10-deployment)\n    [ \uD83E\uDD1D Contributing](#\uD83E\uDD1D-contributing)\n    [ ❓ Troubleshooting &amp; FAQ](#❓-troubleshootaing-&amp;-faq)\n    [ \uD83D\uDCC8 Performance](#\uD83D\uDCC8-performance)\n\n    ## \uD83D\uDCDD Overview\n    이 프로젝트는 여행 계획 및 추천 시스템을 구축하기 위한 것입니다. 사용자는 여행지에 대한 정보를 얻고, 개인화된 추천을 받을 수 있습니다.\n\n    ### Main Purpose\n    - 사용자가 여행 계획을 세우고, 개인의 선호에 맞는 여행지를 추천받을 수 있도록 지원합니다.\n    - 여행지에 대한 정보를 제공하고, 사용자의 클릭 데이터를 기반으로 추천 알고리즘을 통해 맞춤형 여행지를 제안합니다.\n\n    ### Key Features\n    - 사용자 맞춤형 여행지 추천\n    - 여행지 정보 제공\n    - 클릭 데이터를 기반으로 한 추천 알고리즘\n\n    ### Core Technology Stack\n    - Frontend: React, Vite\n    - Backend: Spring Boot\n    - Database: MySQL\n    - Others: Python, FastAPI (AI 모델 서빙)\n\n    ## \uD83D\uDCC1 Project Structure\n    ```\n    moheng\n    ├── \uD83D\uDCC1 ai\n    │   ├── \uD83D\uDCC1 model_serving\n    │   │   ├── \uD83D\uDCC1 application\n    │   │   ├── \uD83D\uDCC1 domain\n    │   │   ├── \uD83D\uDCC1 infra\n    │   │   ├── \uD83D\uDCC1 interface\n    │   │   └── ...\n    │   └── ...\n    ├── \uD83D\uDCC1 frontend\n    │   ├── \uD83D\uDCC1 src\n    │   │   ├── \uD83D\uDCC1 api\n    │   │   ├── \uD83D\uDCC1 components\n    │   │   └── ...\n    │   └── ...\n    ├── \uD83D\uDCC1 moheng\n    │   ├── \uD83D\uDCC1 auth\n    │   ├── \uD83D\uDCC1 planner\n    │   ├── \uD83D\uDCC1 trip\n    │   ├── \uD83D\uDCC1 member\n    │   └── ...\n    └── ...\n    ```\n\n    ## \uD83D\uDE80 Getting Started\n    ...\n"
+    "fileContents" : "    # Project Name\n                moheng\n\n                ## Table of Contents\n                [ \uD83D\uDCDD Overview](#\uD83D\uDCDD-overview)  \n                [ \uD83D\uDCC1 Project Structure](#\uD83D\uDCC1-project-structure)  \n                [ \uD83D\uDE80 Getting Started](#\uD83D\uDE80-getting-started)  \n                [ \uD83D\uDCA1 Motivation](#\uD83D\uDCA1-motivation)  \n                [ \uD83C\uDFAC Demo](#\uD83C\uDFAC-demo)  \n                [ \uD83C\uDF10 Deployment](#\uD83C\uDF10-deployment)  \n                [ \uD83E\uDD1D Contributing](#\uD83E\uDD1D-contributing)  \n                [ ❓ Troubleshooting &amp; FAQ](#❓-troubleshooting-&amp;-faq)  \n                [ \uD83D\uDCC8 Performance](#\uD83D\uDCC8-performance)  \n\n                ## \uD83D\uDCDD Overview\n                이 프로젝트는 여행 계획 및 추천 시스템을 구축하기 위한 것입니다. 사용자는 여행지에 대한 정보를 얻고, 개인화된 추천을 받을 수 있습니다.\n\n                ### Main Purpose\n                - 사용자가 여행 계획을 세우고, 개인의 선호에 맞는 여행지를 추천받을 수 있도록 지원합니다.\n                - 여행지에 대한 정보를 제공하고, 사용자의 클릭 데이터를 기반으로 추천 알고리즘을 통해 맞춤형 여행지를 제안합니다.\n\n                ### Key Features\n                - 사용자 맞춤형 여행지 추천\n                - 여행지 정보 제공\n                - 클릭 데이터를 기반으로 한 추천 알고리즘\n\n                ### Core Technology Stack\n                - Frontend: React, Vite\n                - Backend: Spring Boot\n                - Database: MySQL\n                - Others: Python, FastAPI (AI 모델 서빙)\n\n                ## \uD83D\uDCC1 Project Structure\n                ```\n                moheng\n                ├── \uD83D\uDCC1 ai\n                │   ├── \uD83D\uDCC1 model_serving\n                │   │   ├── \uD83D\uDCC1 application\n                │   │   ├── \uD83D\uDCC1 domain\n                │   │   ├── \uD83D\uDCC1 infra\n                │   │   ├── \uD83D\uDCC1 interface\n                │   │   └── ...\n                │   └── ...\n                ├── \uD83D\uDCC1 frontend\n                │   ├── \uD83D\uDCC1 src\n                │   │   ├── \uD83D\uDCC1 api\n                │   │   ├── \uD83D\uDCC1 components\n                │   │   └── ...\n                │   └── ...\n                ├── \uD83D\uDCC1 moheng\n                │   ├── \uD83D\uDCC1 auth\n                │   ├── \uD83D\uDCC1 planner\n                │   ├── \uD83D\uDCC1 trip\n                │   ├── \uD83D\uDCC1 member\n                │   └── ...\n                └── ...\n                ```\n\n                ## \uD83D\uDE80 Getting Started\n\n                ### Prerequisites\n\n                - 지원 운영 체제\n                  * Windows, macOS, Linux\n                - 필수 소프트웨어\n                  * Node.js (프론트엔드)\n                  * Java (백엔드)\n                  * Python 3.11 (AI)\n                - 버전 요구 사항\n                  * Node.js: 최신 안정 버전\n                  * Java: OpenJDK 22\n                  * Python: 3.11.x\n                - 패키지 관리자\n                  * npm (프론트엔드)\n                  * Poetry (AI)\n                - 시스템 종속성\n                  * Docker\n\n                ### Installation\n\n                - Docker를 사용하여 환경을 설정할 수 있습니다.\n\n                ```bash\n                # 리포지토리 클론\n                git clone https://github.com/kakao-25/moheng.git\n                cd moheng-develop\n\n                # Docker 설정을 위해 Docker가 시스템에 설치되고 실행 중인지 확인하십시오.\n\n                # Docker 컨테이너 빌드 및 실행\n                docker-compose up --build\n\n                # 각 구성 요소를 별도로 빌드하고 실행하려면 아래 단계를 따르십시오:\n\n                # 프론트엔드 설정\n                cd frontend\n                docker build -t moheng-frontend -f Dockerfile.front .\n                docker run -p 3000:3000 moheng-frontend\n\n                # 백엔드 설정\n                cd backend\n                docker build -t moheng-backend -f Dockerfile.prod .\n                docker run -p 8080:8080 moheng-backend\n\n                # AI/서비스 설정\n                cd ai\n                docker build -t moheng-ai -f Dockerfile .\n                docker run -p 8000:8000 moheng-ai\n\n                # Nginx 설정\n                cd nginx\n                docker build -t moheng-nginx -f Dockerfile.prod .\n                docker run -p 80:80 moheng-nginx\n\n                # 환경 구성\n                # 각 구성 요소에 필요한 환경 변수가 설정되어 있는지 확인하십시오.\n                ```\n\n                ### Usage\n\n                ```bash\n                # 실행 방법\n                # Docker 컨테이너 설정 후, 다음 URL을 통해 서비스를 액세스하십시오:\n\n                # 프론트엔드\n                http://localhost:3000\n\n                # 백엔드\n                http://localhost:8080\n\n                # AI 서비스\n                http://localhost:8000\n\n                # Nginx (리버스 프록시 역할)\n                http://localhost\n\n\n                ## \uD83D\uDCA1 Motivation\n                이 프로젝트는 여행 계획을 세우는 데 있어 사용자에게 더 나은 경험을 제공하기 위해 시작되었습니다. 개인의 선호를 반영한 추천 시스템을 통해 사용자가 더 쉽게 여행지를 선택할 수 있도록 돕고자 합니다.\n\n                ## \uD83C\uDFAC Demo\n                ![Demo Video or Screenshot](path/to/demo.mp4)\n\n                ## \uD83C\uDF10 Deployment\n                - AWS, Heroku와 같은 클라우드 플랫폼에 배포 가능\n                - 배포 단계에 따라 환경 설정이 필요합니다.\n\n                ## \uD83E\uDD1D Contributing\n                - 기여 방법: 이슈를 생성하거나 Pull Request를 통해 기여할 수 있습니다.\n                - 코드 표준: Java, Python, JavaScript의 일반적인 코딩 표준을 따릅니다.\n                - Pull Request 프로세스: 변경 사항을 설명하는 메시지와 함께 Pull Request를 제출합니다.\n                - 행동 강령: 모든 기여자는 존중과 배려의 태도로 참여해야 합니다.\n\n                ## ❓ Troubleshooting &amp; FAQ\n                - 자주 발생하는 문제 및 해결 방법을 문서화합니다.\n                - FAQ 섹션을 통해 사용자 질문에 대한 답변을 제공합니다.\n\n                ## \uD83D\uDCC8 Performance\n                - 성능 벤치마크 및 최적화 기법을 문서화합니다.\n                - 시스템의 확장성 고려 사항을 포함합니다.\n"
   } ],
   "regularFiles" : [ {
     "fileName" : "AuthController.md",
-    "fileContents" : "    # Project Name\n    moheng\n\n    ## Table of Contents\n    [ \uD83D\uDCDD Overview](#\uD83D\uDCDD-overview)\n    [ \uD83D\uDCC1 Project Structure](#\uD83D\uDCC1-project-structure)\n    [ \uD83D\uDE80 Getting Started](#\uD83D\uDE80-getting-started)\n    [ \uD83D\uDCA1 Motivation](#\uD83D\uDCA1-motivation)\n    [ \uD83C\uDFAC Demo](#\uD83C\uDFAC-demo)\n    [ \uD83C\uDF10 Deployment](#\uD83C\uDF10-deployment)\n    [ \uD83E\uDD1D Contributing](#\uD83E\uDD1D-contributing)\n    [ ❓ Troubleshooting &amp; FAQ](#❓-troubleshootaing-&amp;-faq)\n    [ \uD83D\uDCC8 Performance](#\uD83D\uDCC8-performance)\n\n    ## \uD83D\uDCDD Overview\n    이 프로젝트는 여행 계획 및 추천 시스템을 구축하기 위한 것입니다. 사용자는 여행지에 대한 정보를 얻고, 개인화된 추천을 받을 수 있습니다.\n\n    ### Main Purpose\n    - 사용자가 여행 계획을 세우고, 개인의 선호에 맞는 여행지를 추천받을 수 있도록 지원합니다.\n    - 여행지에 대한 정보를 제공하고, 사용자의 클릭 데이터를 기반으로 추천 알고리즘을 통해 맞춤형 여행지를 제안합니다.\n\n    ### Key Features\n    - 사용자 맞춤형 여행지 추천\n    - 여행지 정보 제공\n    - 클릭 데이터를 기반으로 한 추천 알고리즘\n\n    ### Core Technology Stack\n    - Frontend: React, Vite\n    - Backend: Spring Boot\n    - Database: MySQL\n    - Others: Python, FastAPI (AI 모델 서빙)\n\n    ## \uD83D\uDCC1 Project Structure\n    ...\n"
+    "fileContents" : "    아래는 제공된 Java 코드에 대한 아키텍처 문서입니다. 이 문서는 시스템의 구조와 각 컴포넌트의 역할을 설명합니다.\n\n                # 시스템 아키텍처 문서\n\n                ## 전체 구조\n                ```mermaid\n                graph TD\n                    A[Client] --&gt; B[AuthController]\n                    B --&gt; C[AuthService]\n                    C --&gt; D[TokenManager]\n                    C --&gt; E[MemberService]\n                    D --&gt; F[MemberToken]\n                    E --&gt; G[Member]\n                ```\n\n                ## 시스템 흐름\n                ```mermaid\n                sequenceDiagram\n                    Client-&gt;&gt;AuthController: Request for URI\n                    AuthController-&gt;&gt;AuthService: generateUri()\n                    AuthService--&gt;&gt;AuthController: Return URI\n                    AuthController-&gt;&gt;Client: Send URI\n\n                    Client-&gt;&gt;AuthController: Login Request\n                    AuthController-&gt;&gt;AuthService: generateTokenWithCode()\n                    AuthService--&gt;&gt;AuthController: Return MemberToken\n                    AuthController-&gt;&gt;Client: Send Access Token\n\n                    Client-&gt;&gt;AuthController: Extend Login Request\n                    AuthController-&gt;&gt;AuthService: generateRenewalAccessToken()\n                    AuthService--&gt;&gt;AuthController: Return RenewalAccessTokenResponse\n                    AuthController-&gt;&gt;Client: Send New Access Token\n\n                    Client-&gt;&gt;AuthController: Logout Request\n                    AuthController-&gt;&gt;AuthService: removeRefreshToken()\n                    AuthService--&gt;&gt;AuthController: Refresh Token Removed\n                    AuthController-&gt;&gt;Client: No Content Response\n                ```\n\n                ## 주요 컴포넌트 설명\n\n                ### AuthController\n                - **역할과 책임**: 클라이언트의 요청을 처리하고, 서비스 계층과의 상호작용을 통해 인증 관련 작업을 수행합니다.\n                - **주요 메서드**:\n                  - `generateUri()`: OAuth 제공자로부터 인증 URI를 생성합니다.\n                  - `login()`: OAuth 인증 코드를 사용하여 로그인하고, 액세스 토큰을 생성합니다.\n                  - `extendLogin()`: 기존의 리프레시 토큰을 사용하여 새로운 액세스 토큰을 생성합니다.\n                  - `logout()`: 리프레시 토큰을 제거하여 로그아웃을 처리합니다.\n\n                ### AuthService\n                - **역할과 책임**: 인증 관련 비즈니스 로직을 처리합니다. OAuth 제공자와의 상호작용, 멤버 생성 및 토큰 관리를 담당합니다.\n                - **주요 메서드**:\n                  - `generateTokenWithCode()`: OAuth 인증 코드를 사용하여 멤버 토큰을 생성합니다.\n                  - `generateUri()`: OAuth 제공자로부터 URI를 생성합니다.\n                  - `generateRenewalAccessToken()`: 리프레시 토큰을 사용하여 새로운 액세스 토큰을 생성합니다.\n                  - `removeRefreshToken()`: 로그아웃 시 리프레시 토큰을 제거합니다.\n                  - `extractMemberId()`: 액세스 토큰에서 멤버 ID를 추출합니다.\n\n                ### TokenManager\n                - **역할과 책임**: 토큰 생성 및 검증을 담당합니다. 액세스 토큰과 리프레시 토큰의 생성 및 관리 기능을 제공합니다.\n\n                ### MemberService\n                - **역할과 책임**: 멤버 관련 데이터의 CRUD 작업을 처리합니다. 멤버의 존재 여부를 확인하고, 새로운 멤버를 생성합니다.\n\n                ### MemberToken\n                - **역할과 책임**: 액세스 토큰과 리프레시 토큰을 포함하는 데이터 구조입니다. 인증 과정에서 생성된 토큰 정보를 저장합니다.\n\n                ## 주의사항\n                1. 각 컴포넌트의 역할과 책임을 명확히 이해하고, 필요 시 추가적인 설명을 덧붙이세요.\n                2. 시스템의 흐름을 시퀀스 다이어그램으로 표현하여 클라이언트와 서버 간의 상호작용을 명확히 하세요.\n                3. 각 메서드의 기능과 사용 예를 문서화하여 개발자들이 쉽게 이해할 수 있도록 하세요.\n"
   } ]
 }</code></pre>
 </div>
@@ -1667,7 +1828,7 @@ Content-Length: 4115
 <div class="sect2">
 <h3 id="_리드미_수정_테스트_api">리드미 수정 테스트 API</h3>
 <div class="sect3">
-<h4 id="_http_request_15">HTTP Request</h4>
+<h4 id="_http_request_18">HTTP Request</h4>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">PUT /api/test/readme/update?repositoryName=dododocs&amp;fileName=Controller_Summary.md&amp;newContent=new%20contents~~ HTTP/1.1
@@ -1678,7 +1839,7 @@ Host: localhost:8080</code></pre>
 </div>
 </div>
 <div class="sect4">
-<h5 id="_request_param_3">Request Param</h5>
+<h5 id="_request_param_2">Request Param</h5>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 50%;">
@@ -1708,7 +1869,7 @@ Host: localhost:8080</code></pre>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_http_response_15">HTTP Response</h4>
+<h4 id="_http_response_18">HTTP Response</h4>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 204 No Content

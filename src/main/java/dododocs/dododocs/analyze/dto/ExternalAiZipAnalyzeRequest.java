@@ -30,6 +30,7 @@ public class ExternalAiZipAnalyzeRequest {
         this.s3Key = s3Key;
         this.blocks = blocks;
         this.repositoryUrl = repositoryUrl;
+
         this.includeTest = includeTest;
         this.korean = korean;
     }
