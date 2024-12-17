@@ -90,6 +90,7 @@ public class AnalyzeService {
         ExternalAiZipAnalyzeResponse externalAiZipAnalyzeResponse =
                 externalAiZipAnalyzeClient.requestAiZipDownloadAndAnalyze(new ExternalAiZipAnalyzeRequest
                         (s3Key, String.format("https://github.com/%s/%s", ownerName, repoName), List.of(), uploadGitRepoContentToS3Request.isIncludeTest(), uploadGitRepoContentToS3Request.isKorean()));
+        // 순서 : 깃허브 닉네임, 레포 이름, 브랜치명
 
         // 1. readMeS3Key / 2. docsS3Key
 
