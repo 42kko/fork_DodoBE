@@ -6,6 +6,7 @@ import dododocs.dododocs.analyze.application.AnalyzeService;
 import dododocs.dododocs.analyze.application.DownloadFromS3Service;
 import dododocs.dododocs.analyze.domain.RepoAnalyze;
 import dododocs.dododocs.analyze.domain.repository.RepoAnalyzeRepository;
+import dododocs.dododocs.analyze.exception.NoExistRepoAnalyzeException;
 import dododocs.dododocs.auth.domain.repository.MemberRepository;
 import dododocs.dododocs.auth.exception.NoExistMemberException;
 import dododocs.dododocs.chatbot.application.ChatbotService;
@@ -68,9 +69,9 @@ public class MemberService {
             FindRegisterRepoResponse response = new FindRegisterRepoResponse(repoAnalyze);
 
             try {
-                chatbotService.questionToChatbotAndSaveLogs(registeredRepoId, "dummy-question");
+                chatbotService.questionToChatbotAndSaveLogs(registeredRepoId, "레포지토리 정보 좀 요약해서 알려줄래?");
                 response.setChatbotComplete(true);
-            } catch (Exception e) {
+            } catch (RuntimeException e) {
                 response.setChatbotComplete(false);
             }
 

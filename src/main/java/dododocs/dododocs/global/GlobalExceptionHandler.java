@@ -21,8 +21,7 @@ public class GlobalExceptionHandler {
     private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     @ExceptionHandler({
-            NoExistGitRepoException.class,
-            NoExistRepoAnalyzeException.class,
+            NoExistGitRepoException.class
     })
     public ResponseEntity<ExceptionResponse> handleNotFoundException(final RuntimeException e) {
         logger.error(e.getMessage(), e);

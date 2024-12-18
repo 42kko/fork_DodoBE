@@ -32,7 +32,7 @@ public class ChatbotService {
                 .toList();
 
         final ExternalQuestToChatbotRequest questToChatbotRequest = new ExternalQuestToChatbotRequest(
-                repoAnalyze.getRepoUrl(),
+                repoAnalyze.getRepoUrl() + "/" + repoAnalyze.getBranchName(),
                 question,
                 recentChatLogs,
                 false
