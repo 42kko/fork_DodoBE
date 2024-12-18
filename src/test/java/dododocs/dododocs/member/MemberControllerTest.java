@@ -25,6 +25,7 @@ import dododocs.dododocs.chatbot.dto.FindMemberInfoResponse;
 import dododocs.dododocs.config.ControllerTestConfig;
 import dododocs.dododocs.member.domain.Member;
 import dododocs.dododocs.member.dto.FindRegisterMemberRepoResponses;
+import dododocs.dododocs.member.dto.FindRegisterRepoResponse;
 import dododocs.dododocs.member.dto.FindRepoNameListResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -70,9 +71,9 @@ public class MemberControllerTest extends ControllerTestConfig {
         given(authService.extractMemberId(anyString())).willReturn(1L);
         given(memberService.findRegisterMemberRepoResponses(anyLong()))
                 .willReturn(new FindRegisterMemberRepoResponses(List.of(
-                        new RepoAnalyze("dododocs", "main", "key1", "key1", "https://dododocs.github.com", new Member("")),
-                        new RepoAnalyze("repo-name2", "develop", "key2", "key2", "https://repo.github.com", new Member("")),
-                        new RepoAnalyze("repo-name3", "feature/social-login", "key3", "key3", "https://repo3.github.com", new Member(""))
+                        new FindRegisterRepoResponse(new RepoAnalyze(1L, "dododocs", "main", "key1", "key1", "https://dododocs.github.com",new Member(""))),
+                        new FindRegisterRepoResponse(new RepoAnalyze(2L, "moheng", "develop", "key2", "key3", "https://moheng.github.com",new Member(""))),
+                        new FindRegisterRepoResponse(new RepoAnalyze(3L, "repo-name3", "main", "key2", "key3", "https://repo-name3.github.com",new Member("")))
                 )));
 
         // when, then
@@ -89,9 +90,13 @@ public class MemberControllerTest extends ControllerTestConfig {
                         ),
                         responseFields(
                                 fieldWithPath("findRegisterRepoResponses[]").description("등록한 레포지토리 리스트"),
+                                fieldWithPath("findRegisterRepoResponses[].registeredRepoId").description("등록된 레포 고유 ID"),
                                 fieldWithPath("findRegisterRepoResponses[].repositoryName").description("레포 이름"),
                                 fieldWithPath("findRegisterRepoResponses[].branchName").description("레포 브랜치 명"),
-                                fieldWithPath("findRegisterRepoResponses[].createdAt").description("레포 등록날짜")
+                                fieldWithPath("findRegisterRepoResponses[].createdAt").description("레포 등록날짜"),
+                                fieldWithPath("findRegisterRepoResponses[].readmeComplete").description("리드미 생성 완료(준비) 여부"),
+                                fieldWithPath("findRegisterRepoResponses[].chatbotComplete").description("챗봇 기능 준비 완료 여부"),
+                                fieldWithPath("findRegisterRepoResponses[].docsComplete").description("문서 생성 완료 여부")
                         )
                 ))
                 .andExpect(status().isOk());

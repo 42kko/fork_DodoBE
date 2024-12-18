@@ -15,6 +15,8 @@ import dododocs.dododocs.analyze.exception.NoExistGitRepoException;
 import dododocs.dododocs.analyze.infrastructure.ExternalAiZipAnalyzeClient;
 import dododocs.dododocs.auth.domain.repository.MemberRepository;
 import dododocs.dododocs.auth.exception.NoExistMemberException;
+import dododocs.dododocs.chatbot.application.ChatbotService;
+import dododocs.dododocs.chatbot.infrastructure.ExternalChatbotClient;
 import dododocs.dododocs.member.domain.Member;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.*;

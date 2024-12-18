@@ -15,13 +15,7 @@ public class FindRegisterMemberRepoResponses {
     private FindRegisterMemberRepoResponses() {
     }
 
-    public FindRegisterMemberRepoResponses(final List<RepoAnalyze> repoAnalyzes) {
-        this.findRegisterRepoResponses = toResponses(repoAnalyzes);
-    }
-
-    private List<FindRegisterRepoResponse> toResponses(final List<RepoAnalyze> repoAnalyzes) {
-        return repoAnalyzes.stream()
-                .map(FindRegisterRepoResponse::new)
-                .collect(Collectors.toList());
+    public FindRegisterMemberRepoResponses(final List<FindRegisterRepoResponse> findRegisterMemberRepoResponses) {
+        this.findRegisterRepoResponses = findRegisterMemberRepoResponses;
     }
 }

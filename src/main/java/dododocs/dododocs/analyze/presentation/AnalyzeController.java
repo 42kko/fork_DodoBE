@@ -61,5 +61,8 @@ public class AnalyzeController {
                                                 @RequestBody final FindGitRepoContentRequest findGitRepoContentRequest) throws IOException {
         return analyzeService.getRepositoryContents(accessor.getId(), findGitRepoContentRequest.getRepositoryName(), findGitRepoContentRequest.getBranchName());
     }
+
+    // 업로딩 되고있는(= 아직 AI 로 부터 챗봇, docs, readme 중 단 하나라도 제공받지 못하는 레포가 있는 경우) 레포지토리 있으면 -> ID 값 리턴
+    // else => null 리턴
 }
 
