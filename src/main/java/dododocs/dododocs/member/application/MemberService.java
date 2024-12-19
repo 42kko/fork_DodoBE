@@ -27,7 +27,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
+// @Transactional(readOnly = true)
 @Service
 public class MemberService {
     private final MemberRepository memberRepository;
