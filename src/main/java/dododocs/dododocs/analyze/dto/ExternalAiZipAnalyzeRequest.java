@@ -5,6 +5,11 @@ import lombok.Getter;
 
 import java.util.List;
 
+// repo_url, include_test, docs_key, readme_key, korean
+
+// docs_key : msung99_moheng_main_DOCS.zip
+// readme_key : msung99_moheng_main_README.md
+
 @Getter
 public class ExternalAiZipAnalyzeRequest {
     // s3 key 값, 레포 주소 필요

@@ -5,6 +5,7 @@ import dododocs.dododocs.analyze.domain.RepoAnalyze;
 import dododocs.dododocs.analyze.domain.repository.RepoAnalyzeRepository;
 import dododocs.dododocs.analyze.dto.DownloadAiAnalyzeResponse;
 import dododocs.dododocs.analyze.dto.DownloadReadmeAnalyzeResponse;
+import dododocs.dododocs.analyze.dto.EmptyFolderException;
 import dododocs.dododocs.analyze.exception.NoExistRepoAnalyzeException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -36,6 +37,33 @@ public class DownloadFromS3Service {
 
         // 2. ZIP 파일 압축 해제
         File extractedDir = unzipFile(zipFile);
+
+        // 3. .md 파일을 FileDetail 형식으로 변환하여 분류
+        Map<String, List<DownloadAiAnalyzeResponse.FileDetail>> categorizedFiles = collectAndCategorizeMarkdownFiles(extractedDir);
+
+        // 4. 임시 파일 삭제
+        zipFile.delete();
+        deleteDirectory(extractedDir);
+
+        return new DownloadAiAnalyzeResponse(categorizedFiles.get("summary"), categorizedFiles.get("regular"));
+    }
+
+    public DownloadAiAnalyzeResponse downloadAndProcessZipDocsInfoTest(final long registeredRepoId) throws IOException {
+        final RepoAnalyze repoAnalyze = repoAnalyzeRepository.findById(registeredRepoId)
+                .orElseThrow(() -> new NoExistRepoAnalyzeException("레포지토리 정보가 존재하지 않습니다."));
+
+        final String s3Key = repoAnalyze.getDocsKey();
+
+        // 1. S3에서 ZIP 파일 다운로드
+        File zipFile = downloadZipFromS3(bucketName, s3Key);
+
+        // 2. ZIP 파일 압축 해제
+        File extractedDir = unzipFile(zipFile);
+
+        // 3. 폴더가 비어있을 경우 예외 처리
+        if (extractedDir.listFiles() == null || extractedDir.listFiles().length == 0) {
+            throw new EmptyFolderException("압축 해제된 폴더가 비어 있습니다.");
+        }
 
         // 3. .md 파일을 FileDetail 형식으로 변환하여 분류
         Map<String, List<DownloadAiAnalyzeResponse.FileDetail>> categorizedFiles = collectAndCategorizeMarkdownFiles(extractedDir);
