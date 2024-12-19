@@ -21,9 +21,6 @@ public class ChatbotService {
     private final RepoAnalyzeRepository repoAnalyzeRepository;
     private final ChatLogRepository chatLogRepository;
 
-    // 1. stream
-    // 2. 비즈니스 로직 재설계 => 대화내역
-
     public ExternalQuestToChatbotResponse questionToChatbotAndSaveLogs(final long registeredRepoId, final String question) {
         final RepoAnalyze repoAnalyze = repoAnalyzeRepository.findById(registeredRepoId)
                 .orElseThrow(() -> new NoExistRepoAnalyzeException("레포지토리 정보가 존재하지 않습니다."));

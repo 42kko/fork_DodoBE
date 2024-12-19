@@ -1,13 +1,19 @@
 package dododocs.dododocs.analyze.domain;
 
+import dododocs.dododocs.chatbot.domain.ChatLog;
 import dododocs.dododocs.global.BaseEntity;
 import dododocs.dododocs.member.domain.Member;
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.Setter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Table(name = "repo_analyze")
 @Getter
 @Entity
+@Setter
 public class RepoAnalyze extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,6 +37,12 @@ public class RepoAnalyze extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
+
+    @Column(name = "analyzed")
+    private boolean analyzed = false;
+
+    @OneToMany(mappedBy = "repoAnalyze", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ChatLog> chatLogs = new ArrayList<>();
 
     protected RepoAnalyze() {
     }
