@@ -9,6 +9,7 @@ spring:
     url: ${DB_URL}
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
+  connection-timeout: 180000  # 3 minutes (in milliseconds)
   jpa:
     properties:
       hibernate:
