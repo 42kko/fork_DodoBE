@@ -188,7 +188,7 @@ public class AnalyzeService {
         String activeProfile = System.getProperty("spring.profiles.active", "default");
 
         // dev 또는 prod 프로파일에만 프록시 설정
-        if ("dev".equals(activeProfile) || "prod".equals(activeProfile)) {
+        if ("dev".equals(activeProfile)) {
             Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("krmp-proxy.9rum.cc", 3128));
             connection = url.openConnection(proxy);
         } else {
