@@ -83,7 +83,7 @@ public class DownloadFromS3Service {
         System.out.println("s3key:" + s3Key);
         System.out.println("===============================================");
 
-        try (InputStream inputStream = amazonS3Client.getObject(bucketName, s3Key).getObjectContent();
+        try (InputStream inputStream = amazonS3Client.getObject(bucketName, "result/" + s3Key).getObjectContent();
              FileOutputStream outputStream = new FileOutputStream(tempZipFile)) {
 
             byte[] buffer = new byte[8192];
@@ -324,7 +324,7 @@ public class DownloadFromS3Service {
     }
 
     private String downloadFileFromS3(String bucketName, String s3Key) throws IOException {
-        try (InputStream inputStream = amazonS3Client.getObject(bucketName, s3Key).getObjectContent();
+        try (InputStream inputStream = amazonS3Client.getObject(bucketName, "result/" + s3Key).getObjectContent();
              BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
 
             StringBuilder content = new StringBuilder();

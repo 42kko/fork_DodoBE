@@ -74,7 +74,7 @@ public class MemberService {
                 .collect(Collectors.toList()));
     }
 
-public FindRegisterMemberRepoResponses findRegisterMemberRepoResponses(final long memberId) {
+    public FindRegisterMemberRepoResponses findRegisterMemberRepoResponses(final long memberId) {
         final Member member = memberRepository.findById(memberId)
                 .orElseThrow(NoExistMemberException::new);
 
