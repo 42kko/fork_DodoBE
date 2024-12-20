@@ -34,9 +34,20 @@ public class RepoRegisterService {
     public void updateReadmeDocsRepoAnalyzeReadyStatus(final UpdateReadmeDocsRepoAnalyzeReadyStatusRequest updateRepoAnalyzeReadyStatusRequest) {
         final RepoAnalyze repoAnalyze = findByRepoUrl(updateRepoAnalyzeReadyStatusRequest.getRepoUrl());
 
-        repoAnalyze.setReadmeCompleted(updateRepoAnalyzeReadyStatusRequest.isReadmeCompleted());
-        repoAnalyze.setDocsCompleted(updateRepoAnalyzeReadyStatusRequest.isDocsCompleted());
-        repoAnalyzeRepository.save(repoAnalyze);
+        repoAnalyzeRepository.save(
+                new RepoAnalyze(
+                        repoAnalyze.getId(),
+                        repoAnalyze.getRepositoryName(),
+                        repoAnalyze.getBranchName(),
+                        repoAnalyze.getReadMeKey(),
+                        repoAnalyze.getDocsKey(),
+                        repoAnalyze.getRepoUrl(),
+                        repoAnalyze.getMember(),
+                        updateRepoAnalyzeReadyStatusRequest.isDocsCompleted(),
+                        updateRepoAnalyzeReadyStatusRequest.isReadmeCompleted(),
+                        repoAnalyze.isChatbotCompleted()
+                )
+        );
     }
 
     public void updateChatbotRepoAnalyzeReadyStatus(final UpdateChatbotDocsRepoAnalyzeReadyStatusRequest updateRepoAnalyzeReadyStatusRequest) {
@@ -44,6 +55,21 @@ public class RepoRegisterService {
 
         repoAnalyze.setChatbotCompleted(updateRepoAnalyzeReadyStatusRequest.isChatbotCompleted());
         repoAnalyzeRepository.save(repoAnalyze);
+
+        repoAnalyzeRepository.save(
+                new RepoAnalyze(
+                        repoAnalyze.getId(),
+                        repoAnalyze.getRepositoryName(),
+                        repoAnalyze.getBranchName(),
+                        repoAnalyze.getReadMeKey(),
+                        repoAnalyze.getDocsKey(),
+                        repoAnalyze.getRepoUrl(),
+                        repoAnalyze.getMember(),
+                        repoAnalyze.isDocsCompleted(),
+                        repoAnalyze.isReadmeCompleted(),
+                        updateRepoAnalyzeReadyStatusRequest.isChatbotCompleted()
+                )
+        );
     }
 
     private RepoAnalyze findByRepoUrl(final String repoUrl) {

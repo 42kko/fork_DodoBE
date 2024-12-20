@@ -47,9 +47,6 @@ public class RepoAnalyze extends BaseEntity {
     @Column(name = "chatbot_completed")
     private boolean chatbotCompleted = false;
 
-    @Column(name = "analyzed")
-    private boolean analyzed = false;
-
     @OneToMany(mappedBy = "repoAnalyze", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ChatLog> chatLogs = new ArrayList<>();
 
@@ -73,6 +70,20 @@ public class RepoAnalyze extends BaseEntity {
         this.docsKey = docsKey;
         this.repoUrl = repoUrl;
         this.member = member;
+    }
+
+    public RepoAnalyze(final long id, final String repositoryName, final String branchName, final String readMeKey, final String docsKey, final String repoUrl, final Member member,
+                       final boolean docsCompleted, final boolean readmeCompleted, final boolean chatbotCompleted) {
+        this.id = id;
+        this.repositoryName = repositoryName;
+        this.branchName = branchName;
+        this.readMeKey = readMeKey;
+        this.docsKey = docsKey;
+        this.repoUrl = repoUrl;
+        this.member = member;
+        this.docsCompleted = docsCompleted;
+        this.readmeCompleted = readmeCompleted;
+        this.chatbotCompleted = chatbotCompleted;
     }
 
     public RepoAnalyze(final long id, final String repositoryName) {
