@@ -12,6 +12,8 @@ public class CorsConfig implements WebMvcConfigurer {
     public void addCorsMappings(final CorsRegistry registry) {
         registry.addMapping("/**")
                 .allowedOrigins("http://localhost:3000", "http://localhost:8000", "http://localhost:8080", "http://127.0.0.1:5500",
+                        "http://ai.dododocs.com:5000",
+                        "http://ai.dododocs.com:8000",
                         "https://dododocs.com", "https://dododocs.com:3000", "https://dododocs.com:443",
                         "http://ai.dododocs.com:5001",
                         "https://kcfaa61d53ebba.user-app.krampoline.com", "https://kcfaa61d53ebba.user-app.krampoline.com:3000")

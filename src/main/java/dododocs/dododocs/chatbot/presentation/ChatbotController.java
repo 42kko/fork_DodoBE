@@ -61,7 +61,7 @@ public class ChatbotController {
         return ResponseEntity.ok(chatbotService.findChatbotHistory(registeredRepoId, pageable));
     }
 
-    @GetMapping(value = "/stream-from-backend", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    /* @GetMapping(value = "/stream-from-backend", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<TestWebFluxResponse> streamFromBackend() {
         System.out.println("AI 서버로 데이터 요청 시작...");
         System.out.println(aiBasicUrl);
@@ -75,7 +75,7 @@ public class ChatbotController {
                 })
                 .doOnError(error -> System.err.println("AI 서버 연결 에러: " + error.getMessage()))
                 .onErrorResume(error -> Flux.just(new TestWebFluxResponse("AI 서버와 연결 중 문제가 발생했습니다.")));
-    }
+    } */
 
     @GetMapping(value = "/stream-and-save-test", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<TestWebFluxResponse> streamAndSaveChatLogsTest() {
@@ -102,7 +102,7 @@ public class ChatbotController {
                 .onErrorResume(error -> Flux.just(new TestWebFluxResponse("AI 서버와 연결 중 문제가 발생했습니다.")));
     }
 
-    @GetMapping(value = "/stream-and-save", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    @GetMapping(value = "/stream-and-save/{registeredRepoId}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<TestWebFluxResponse> streamAndSaveChatLogs(@Authentication final Accessor accessor,
                                                            @PathVariable final Long registeredRepoId,
                                                            @RequestBody final QuestToChatbotRequest questToChatbotRequest) {
@@ -115,8 +115,13 @@ public class ChatbotController {
                 .map(chatLog -> new ExternalQuestToChatbotRequest.RecentChatLog(chatLog.getQuestion(), chatLog.getAnswer()))
                 .toList();
 
+        System.out.println("==================123123123");
+        System.out.println(aiBasicUrl);
+        System.out.println(repoAnalyze.getRepoUrl());
+        System.out.println("==================123122223123");
+
         final ExternalQuestToChatbotRequest externalQuestToChatbotRequest = new ExternalQuestToChatbotRequest(
-                repoAnalyze.getRepositoryName(),
+                repoAnalyze.getRepoUrl(),
                 questToChatbotRequest.getQuestion(),
                 recentChatLogs
         );
@@ -141,5 +146,4 @@ public class ChatbotController {
                 .doOnError(error -> System.err.println("AI 서버 연결 에러: " + error.getMessage()))
                 .onErrorResume(error -> Flux.just(new TestWebFluxResponse("AI 서버와 연결 중 문제가 발생했습니다.")));
     }
-
 }

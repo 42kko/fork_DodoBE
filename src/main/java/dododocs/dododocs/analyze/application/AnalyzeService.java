@@ -106,7 +106,7 @@ public class AnalyzeService {
         }
 
         String s3Key = ownerName + "-" + repoName;
-        String repoUrl = String.format("https://github.com/%s/%s", ownerName, repoName);
+        String repoUrl = String.format("https://github.com/%s/%s/%s", ownerName, repoName, branchName);
         /* ExternalAiZipAnalyzeResponse externalAiZipAnalyzeResponse =
                 externalAiZipAnalyzeClient.requestAiZipDownloadAndAnalyze(new ExternalAiZipAnalyzeRequest
                         (s3Key, String.format("https://github.com/%s/%s/%s", ownerName, repoName, branchName), List.of(), uploadGitRepoContentToS3Request.isIncludeTest(), uploadGitRepoContentToS3Request.isKorean()));
