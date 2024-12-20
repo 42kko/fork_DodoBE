@@ -32,6 +32,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.reactive.function.client.WebClient;
 
 @AutoConfigureRestDocs
 @WebMvcTest({
@@ -93,4 +94,7 @@ public abstract class ControllerTestConfig {
 
     @MockBean
     protected RepoAnalyzeRepository repoAnalyzeRepository;
+
+    @MockBean
+    protected WebClient webClient;
 }
