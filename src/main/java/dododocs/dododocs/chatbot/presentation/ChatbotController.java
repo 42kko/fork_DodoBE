@@ -102,7 +102,7 @@ public class ChatbotController {
                 .onErrorResume(error -> Flux.just(new TestWebFluxResponse("AI 서버와 연결 중 문제가 발생했습니다.")));
     }
 
-    @GetMapping(value = "/stream-and-save/{registeredRepoId}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    @PostMapping(value = "/stream-and-save/{registeredRepoId}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<TestWebFluxResponse> streamAndSaveChatLogs(@PathVariable final Long registeredRepoId,
                                                            @RequestBody final QuestToChatbotRequest questToChatbotRequest) {
         final RepoAnalyze repoAnalyze = repoAnalyzeRepository.findById(registeredRepoId)
