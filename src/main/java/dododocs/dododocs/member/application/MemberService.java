@@ -4,7 +4,9 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dododocs.dododocs.analyze.application.AnalyzeService;
 import dododocs.dododocs.analyze.application.DownloadFromS3Service;
+import dododocs.dododocs.analyze.domain.MemberOrganization;
 import dododocs.dododocs.analyze.domain.RepoAnalyze;
+import dododocs.dododocs.analyze.domain.repository.MemberOrganizationRepository;
 import dododocs.dododocs.analyze.domain.repository.RepoAnalyzeRepository;
 import dododocs.dododocs.analyze.dto.EmptyFolderException;
 import dododocs.dododocs.analyze.exception.NoExistRepoAnalyzeException;
@@ -31,6 +33,7 @@ import java.util.stream.Collectors;
 @Service
 public class MemberService {
     private final MemberRepository memberRepository;
+    private final MemberOrganizationRepository memberOrganizationRepository;
     private final RepoAnalyzeRepository repoAnalyzeRepository;
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
@@ -41,6 +44,7 @@ public class MemberService {
     public FindRepoNameListResponse getUserRepositories(final long memberId) {
         final Member member = memberRepository.findById(memberId)
                 .orElseThrow(NoExistMemberException::new);
+
         final String memberName = member.getOriginName();
         final String url = "https://api.github.com/users/" + memberName + "/repos";
 
@@ -49,12 +53,28 @@ public class MemberService {
 
         List<Map<String, Object>> repos = objectMapper.convertValue(response, new TypeReference<List<Map<String, Object>>>() {});
 
-        return new FindRepoNameListResponse(repos.stream()
-                    .map(repo -> (String) repo.get("name"))
-                    .collect(Collectors.toList()));
+        final List<String> memberOrganizations = memberOrganizationRepository.findOrganizationNamesByMember(member);
+
+        // 조직 이름으로도 레포지토리 검색
+        List<Map<String, Object>> organizationRepos = memberOrganizations.stream()
+                .flatMap(orgName -> {
+                    String orgUrl = "https://api.github.com/orgs/" + orgName + "/repos";
+                    Object orgResponse = restTemplate.getForObject(orgUrl, Object.class);
+                    return objectMapper.convertValue(orgResponse, new TypeReference<List<Map<String, Object>>>() {}).stream();
+                })
+                .collect(Collectors.toList());
+
+        // 사용자 레포와 조직 레포 병합
+        List<Map<String, Object>> combinedRepos = new ArrayList<>(repos);
+        combinedRepos.addAll(organizationRepos);
+
+        return new FindRepoNameListResponse(combinedRepos.stream()
+                .map(repo -> (String) repo.get("name"))
+                .distinct()
+                .collect(Collectors.toList()));
     }
 
-    public FindRegisterMemberRepoResponses findRegisterMemberRepoResponses(final long memberId) {
+public FindRegisterMemberRepoResponses findRegisterMemberRepoResponses(final long memberId) {
         final Member member = memberRepository.findById(memberId)
                 .orElseThrow(NoExistMemberException::new);
 
@@ -62,8 +82,26 @@ public class MemberService {
         return new FindRegisterMemberRepoResponses(findRepoRegisteredCompleteStatus(repoAnalyzes));
     }
 
-
     private List<FindRegisterRepoResponse> findRepoRegisteredCompleteStatus(final List<RepoAnalyze> repoAnalyzes) {
+        List<FindRegisterRepoResponse> findRegisterRepoResponses = new ArrayList<>();
+
+        for (final RepoAnalyze repoAnalyze : repoAnalyzes) {
+            final long registeredRepoId = repoAnalyze.getId();
+
+            FindRegisterRepoResponse response = new FindRegisterRepoResponse(repoAnalyze);
+
+            response.setReadmeComplete(repoAnalyze.isReadmeCompleted());
+            response.setDocsComplete(repoAnalyze.isDocsCompleted());
+            response.setChatbotComplete(repoAnalyze.isChatbotCompleted());
+
+            findRegisterRepoResponses.add(response);
+        }
+
+        return findRegisterRepoResponses;
+    }
+
+
+    /* private List<FindRegisterRepoResponse> findRepoRegisteredCompleteStatus(final List<RepoAnalyze> repoAnalyzes) {
         List<FindRegisterRepoResponse> findRegisterRepoResponses = new ArrayList<>();
 
         for (final RepoAnalyze repoAnalyze : repoAnalyzes) {
@@ -117,7 +155,7 @@ public class MemberService {
         }
 
         return findRegisterRepoResponses;
-    }
+    } */
 
 
     public FindMemberInfoResponse findMemberInfo(final long memberId) {

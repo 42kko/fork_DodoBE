@@ -38,6 +38,15 @@ public class RepoAnalyze extends BaseEntity {
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
+    @Column(name = "docs_completed")
+    private boolean docsCompleted = false;
+
+    @Column(name = "readme_completed")
+    private boolean readmeCompleted = false;
+
+    @Column(name = "chatbot_completed")
+    private boolean chatbotCompleted = false;
+
     @Column(name = "analyzed")
     private boolean analyzed = false;
 

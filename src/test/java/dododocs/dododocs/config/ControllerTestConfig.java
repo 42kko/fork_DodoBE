@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import dododocs.dododocs.analyze.application.AnalyzeService;
 import dododocs.dododocs.analyze.application.DownloadFromS3Service;
 import dododocs.dododocs.analyze.application.RepoRegisterService;
+import dododocs.dododocs.analyze.domain.repository.RepoAnalyzeRepository;
 import dododocs.dododocs.analyze.presentation.AnalyzeController;
 import dododocs.dododocs.analyze.presentation.RepoRegisterController;
 import dododocs.dododocs.analyze.presentation.S3DownloadController;
@@ -16,6 +17,7 @@ import dododocs.dododocs.auth.infrastructure.GithubOAuthClient;
 import dododocs.dododocs.auth.presentation.AuthController;
 import dododocs.dododocs.auth.presentation.authentication.AuthenticationBearerExtractor;
 import dododocs.dododocs.chatbot.application.ChatbotService;
+import dododocs.dododocs.chatbot.domain.repository.ChatLogRepository;
 import dododocs.dododocs.chatbot.presentation.ChatbotController;
 import dododocs.dododocs.global.config.S3Config;
 import dododocs.dododocs.member.application.MemberService;
@@ -85,4 +87,10 @@ public abstract class ControllerTestConfig {
 
     @MockBean
     protected ChatbotService chatbotService;
+
+    @MockBean
+    protected ChatLogRepository chatLogRepository;
+
+    @MockBean
+    protected RepoAnalyzeRepository repoAnalyzeRepository;
 }

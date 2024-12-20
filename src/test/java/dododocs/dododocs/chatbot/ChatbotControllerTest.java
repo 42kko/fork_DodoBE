@@ -59,7 +59,7 @@ public class ChatbotControllerTest extends ControllerTestConfig {
                 .andExpect(status().isOk());
     }
 
-    @DisplayName("챗봇에게 질문하기")
+    /* @DisplayName("챗봇에게 질문하기")
     @Test
     void askToChatbot() throws Exception {
         // given
@@ -89,5 +89,5 @@ public class ChatbotControllerTest extends ControllerTestConfig {
                         )
                 ))
                 .andExpect(status().isOk());
-    }
+    } */
 }

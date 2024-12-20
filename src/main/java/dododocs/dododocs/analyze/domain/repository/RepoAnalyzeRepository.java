@@ -11,5 +11,7 @@ public interface RepoAnalyzeRepository extends JpaRepository<RepoAnalyze, Long> 
     Optional<RepoAnalyze> findByRepositoryName(final String repositoryName);
     List<RepoAnalyze> findByMember(final Member member);
     void deleteById(final Long id);
+
+    Optional<RepoAnalyze> findByRepositoryNameAndBranchName(final String repositoryName, final String branchName);
 }
 
