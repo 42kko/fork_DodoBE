@@ -23,7 +23,7 @@ public class WebClientConfig {
     private String aiBasicUrl;
 
     @Bean
-    @Profile({"dev", "prod"})
+    @Profile({"dev"})
     public WebClient webClientWithProxy() {
         InetSocketAddress proxyAddress = new InetSocketAddress("krmp-proxy.9rum.cc", 3128);
 

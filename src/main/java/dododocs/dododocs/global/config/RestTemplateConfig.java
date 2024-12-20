@@ -15,7 +15,7 @@ import java.net.Proxy;
 public class RestTemplateConfig {
 
     @Bean
-    @Profile({"dev", "prod"})
+    @Profile({"dev"})
     public RestTemplate restTemplateWithProxy() {
         SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
 
