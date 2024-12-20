@@ -21,7 +21,7 @@ public class S3Config {
     private String region;
 
     @Bean
-    @Profile({"dev", "prod"})
+    @Profile({"dev"})
     public AmazonS3Client amazonS3ClientWithProxy() {
         // AWS 인증 정보 생성
         BasicAWSCredentials basicAWSCredentials = new BasicAWSCredentials(accessKey, secretKey);
@@ -40,7 +40,7 @@ public class S3Config {
     }
 
     @Bean
-    @Profile({"default", "local", "test"})
+    @Profile({"default", "local", "test", "prod"})
     public AmazonS3Client simpleAmazonS3Client() {
         // AWS 인증 정보 생성
         BasicAWSCredentials basicAWSCredentials = new BasicAWSCredentials(accessKey, secretKey);

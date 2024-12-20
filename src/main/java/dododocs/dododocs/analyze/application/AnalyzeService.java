@@ -53,6 +53,8 @@ public class AnalyzeService {
     // GitHub 레포지토리를 ZIP 파일로 가져와 S3에 업로드
     public void uploadGithubRepoToS3(final UploadGitRepoContentToS3Request uploadGitRepoContentToS3Request, final long memberId) {
 
+        System.out.println("=================12312312312312312321312");
+
         final String repoName = uploadGitRepoContentToS3Request.getRepositoryName();
         final String branchName = uploadGitRepoContentToS3Request.getBranchName();
 

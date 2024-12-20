@@ -31,11 +31,11 @@ public class ChatbotController {
     private final ChatbotService chatbotService;
     private final ChatLogRepository chatLogRepository;
     private final RepoAnalyzeRepository repoAnalyzeRepository;
+    private final WebClient webClient;
 
     @Value("${ai.basic_url}")
     private String aiBasicUrl;
 
-    private WebClient webClient;
 
     @PostMapping("/question/save/{registeredRepoId}")
     public Flux<ExternalQuestToChatbotResponse> questionToChatbotAndSaveLogs(@Authentication final Accessor accessor,

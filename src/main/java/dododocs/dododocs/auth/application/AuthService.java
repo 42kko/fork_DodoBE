@@ -30,12 +30,6 @@ public class AuthService {
     public String generateTokenWithCode(final String code) throws Exception {
         final GithubOAuthMember githubOAuthMember = githubOAuthClient.getOAuthMember(code);
 
-        System.out.println("🔥 ======================================");
-        System.out.println("socialLoginId:" + githubOAuthMember.getSocialLoginId());
-        System.out.println("nickname:" + githubOAuthMember.getNickName());
-        System.out.println("originName:" + githubOAuthMember.getOriginName());
-        System.out.println("❤️ ======================================");
-
         final Member foundMember = findOrCreateMember(githubOAuthMember);
         githubOrganizationClient.saveMemberOrganizationNames(foundMember, githubOAuthMember.getOriginName());
         final String accessToken = jwtTokenCreator.createToken(foundMember.getId());
