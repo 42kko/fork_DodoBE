@@ -37,15 +37,6 @@ public class ChatbotController {
 
     private WebClient webClient;
 
-    @PostConstruct
-    public void initWebClient() {
-        // WebClient 초기화 시 aiBasicUrl을 사용
-        this.webClient = WebClient.builder()
-                .baseUrl(aiBasicUrl)
-                .defaultHeader(HttpHeaders.ACCEPT, MediaType.TEXT_EVENT_STREAM_VALUE) // SSE 헤더
-                .build();
-    }
-
     @PostMapping("/question/save/{registeredRepoId}")
     public Flux<ExternalQuestToChatbotResponse> questionToChatbotAndSaveLogs(@Authentication final Accessor accessor,
                                                                              @PathVariable final Long registeredRepoId,
@@ -139,7 +130,7 @@ public class ChatbotController {
                 })
                 .doOnComplete(() -> {
                     String aggregatedResult = aggregatedText.toString().trim();
-                    chatLogRepository.save(new ChatLog("Aggregated Question", aggregatedResult, repoAnalyze));
+                    chatLogRepository.save(new ChatLog(questToChatbotRequest.getQuestion(), aggregatedResult, repoAnalyze));
                     System.out.println("전체 텍스트 저장 완료: " + aggregatedResult);
                 })
                 .doOnError(error -> System.err.println("AI 서버 연결 에러: " + error.getMessage()))
