@@ -36,7 +36,7 @@ public class WebClientConfig {
     }
 
     @Bean
-    @Profile({"default", "local", "test"})
+    @Profile({"default", "local", "test", "prod"})
     public WebClient simpleWebClient() {
         return WebClient.builder()
                 .baseUrl(aiBasicUrl)

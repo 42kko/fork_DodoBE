@@ -26,7 +26,7 @@ public class RestTemplateConfig {
     }
 
     @Bean
-    @Profile({"default", "local", "test"})
+    @Profile({"default", "local", "test", "prod"})
     public RestTemplate simpleRestTemplate() {
         return new RestTemplate();
     }
