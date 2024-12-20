@@ -103,8 +103,7 @@ public class ChatbotController {
     }
 
     @GetMapping(value = "/stream-and-save/{registeredRepoId}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Flux<TestWebFluxResponse> streamAndSaveChatLogs(@Authentication final Accessor accessor,
-                                                           @PathVariable final Long registeredRepoId,
+    public Flux<TestWebFluxResponse> streamAndSaveChatLogs(@PathVariable final Long registeredRepoId,
                                                            @RequestBody final QuestToChatbotRequest questToChatbotRequest) {
         final RepoAnalyze repoAnalyze = repoAnalyzeRepository.findById(registeredRepoId)
                 .orElseThrow(() -> new NoExistRepoAnalyzeException("레포지토리 정보가 존재하지 않습니다."));
