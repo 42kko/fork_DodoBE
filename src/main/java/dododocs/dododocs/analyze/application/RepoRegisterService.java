@@ -34,8 +34,6 @@ public class RepoRegisterService {
     public void updateReadmeDocsRepoAnalyzeReadyStatus(final UpdateReadmeDocsRepoAnalyzeReadyStatusRequest updateRepoAnalyzeReadyStatusRequest) {
         final RepoAnalyze repoAnalyze = findByRepoUrl(updateRepoAnalyzeReadyStatusRequest.getRepoUrl());
 
-        final boolean isDocsCOmpleted = false;
-
         repoAnalyzeRepository.save(
                 new RepoAnalyze(
                         repoAnalyze.getId(),
@@ -46,12 +44,13 @@ public class RepoRegisterService {
                         repoAnalyze.getRepoUrl(),
                         repoAnalyze.getMember(),
 
-                        updateRepoAnalyzeReadyStatusRequest.isDocsCompleted(),
-                        updateRepoAnalyzeReadyStatusRequest.isReadmeCompleted(),
+                        updateRepoAnalyzeReadyStatusRequest.isDocsCompleted() ? updateRepoAnalyzeReadyStatusRequest.isDocsCompleted() : repoAnalyze.isDocsCompleted(),
+                        updateRepoAnalyzeReadyStatusRequest.isReadmeCompleted() ? updateRepoAnalyzeReadyStatusRequest.isReadmeCompleted() : repoAnalyze.isReadmeCompleted(),
                         repoAnalyze.isChatbotCompleted()
                 )
         );
     }
+
 
     public void updateChatbotRepoAnalyzeReadyStatus(final UpdateChatbotDocsRepoAnalyzeReadyStatusRequest updateRepoAnalyzeReadyStatusRequest) {
         final RepoAnalyze repoAnalyze = findByRepoUrl(updateRepoAnalyzeReadyStatusRequest.getRepoUrl());

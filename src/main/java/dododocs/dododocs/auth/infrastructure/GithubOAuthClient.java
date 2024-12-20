@@ -36,6 +36,11 @@ public class GithubOAuthClient {
     }
 
     public GithubOAuthMember getOAuthMember(final String code) {
+        System.out.println("🔥 ======================================");
+        System.out.println("clientId:" + clientId);
+        System.out.println("clientSecret:" + clientSecret);
+        System.out.println("❤️ ======================================");
+
         final String accessToken = requestGithubAccessToken(code);
 
         final HttpHeaders httpHeaders = new HttpHeaders();
