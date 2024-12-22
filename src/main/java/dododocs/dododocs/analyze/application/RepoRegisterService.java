@@ -55,9 +55,6 @@ public class RepoRegisterService {
     public void updateChatbotRepoAnalyzeReadyStatus(final UpdateChatbotDocsRepoAnalyzeReadyStatusRequest updateRepoAnalyzeReadyStatusRequest) {
         final RepoAnalyze repoAnalyze = findByRepoUrl(updateRepoAnalyzeReadyStatusRequest.getRepoUrl());
 
-        repoAnalyze.setChatbotCompleted(updateRepoAnalyzeReadyStatusRequest.isChatbotCompleted());
-        repoAnalyzeRepository.save(repoAnalyze);
-
         repoAnalyzeRepository.save(
                 new RepoAnalyze(
                         repoAnalyze.getId(),
