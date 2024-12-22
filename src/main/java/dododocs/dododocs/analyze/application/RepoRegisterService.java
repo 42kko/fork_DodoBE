@@ -77,13 +77,20 @@ public class RepoRegisterService {
             throw new IllegalArgumentException("Invalid repoUrl format: " + repoUrl);
         }
 
+
+        final String userName = parts[3];
+        final Member member = memberRepository.findByOriginName(userName);
+
         final String repoName = parts[4];
         final String branchName = parts[5];
 
-        System.out.println("repoName: +" + repoName);
-        System.out.println("branchName: +" + branchName);
+        System.out.println("userName: " + userName);
+        System.out.println("realUserName: " + member.getOriginName());
+        System.out.println("realUseId: " + member.getId());
+        System.out.println("repoName: " + repoName);
+        System.out.println("branchName: " + branchName);
 
-        return repoAnalyzeRepository.findByRepositoryNameAndBranchName(repoName, branchName)
+        return repoAnalyzeRepository.findByMemberNameAndRepositoryNameAndBranchName(userName, repoName, branchName)
                 .orElseThrow(() -> new IllegalArgumentException("No RepoAnalyze found for repoName: " + repoName + " and branchName: " + branchName));
     }
 }
