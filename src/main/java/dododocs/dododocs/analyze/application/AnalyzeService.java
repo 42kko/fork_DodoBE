@@ -97,7 +97,7 @@ public class AnalyzeService {
                         uploadGitRepoContentToS3Request.isKorean(),
                         orgName, repoName, branchName);
                 if (success) {
-                    ownerName = orgName;
+                    // ownerName = orgName;
                     break;
                 }
             }
