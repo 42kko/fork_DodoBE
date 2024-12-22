@@ -93,28 +93,22 @@ public class ChatbotController {
                 .onErrorResume(error -> Flux.just(new TestWebFluxResponse("AI 서버와 연결 중 문제가 발생했습니다.")));
     }
 
-    @GetMapping(value = "/stream-and-save/{registeredRepoId}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Flux<TestWebFluxResponse> streamAndSaveChatLogs(
-            @PathVariable final Long registeredRepoId,
-            @RequestParam final String question) {
-
+    @PostMapping(value = "/stream-and-save/{registeredRepoId}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public Flux<TestWebFluxResponse> streamAndSaveChatLogs(@PathVariable final Long registeredRepoId,
+                                                           @RequestBody final QuestToChatbotRequest questToChatbotRequest) {
         final RepoAnalyze repoAnalyze = repoAnalyzeRepository.findById(registeredRepoId)
                 .orElseThrow(() -> new NoExistRepoAnalyzeException("레포지토리 정보가 존재하지 않습니다."));
 
         final List<ChatLog> chatLogs = chatLogRepository.findTop3ByRepoAnalyzeOrderBySequenceDesc(repoAnalyze);
-
         final List<ExternalQuestToChatbotRequest.RecentChatLog> recentChatLogs = chatLogs.stream()
                 .map(chatLog -> new ExternalQuestToChatbotRequest.RecentChatLog(chatLog.getQuestion(), chatLog.getAnswer()))
                 .toList();
 
-        System.out.println("==================123123123");
-        System.out.println(aiBasicUrl);
-        System.out.println(repoAnalyze.getRepoUrl());
-        System.out.println("==================123122223123");
+        System.out.println("레포 URL: " + repoAnalyze.getRepoUrl());
 
         final ExternalQuestToChatbotRequest externalQuestToChatbotRequest = new ExternalQuestToChatbotRequest(
                 repoAnalyze.getRepoUrl(),
-                question,
+                questToChatbotRequest.getQuestion(),
                 recentChatLogs
         );
 
@@ -122,7 +116,7 @@ public class ChatbotController {
 
         return webClient.post()
                 .uri("/chat")
-                .bodyValue(externalQuestToChatbotRequest) // 요청 바디에 ExternalQuestToChatbotRequest 추가
+                .bodyValue(externalQuestToChatbotRequest)
                 .retrieve()
                 .bodyToFlux(String.class)
                 .map(data -> {
@@ -132,11 +126,13 @@ public class ChatbotController {
                 })
                 .doOnComplete(() -> {
                     String aggregatedResult = aggregatedText.toString().trim();
-                    chatLogRepository.save(new ChatLog(question, aggregatedResult, repoAnalyze));
+                    chatLogRepository.save(new ChatLog(questToChatbotRequest.getQuestion(), aggregatedResult, repoAnalyze));
                     System.out.println("전체 텍스트 저장 완료: " + aggregatedResult);
                 })
-                .doOnError(error -> System.err.println("AI 서버 연결 에러: " + error.getMessage()))
-                .onErrorResume(error -> Flux.just(new TestWebFluxResponse("AI 서버와 연결 중 문제가 발생했습니다.")));
+                .doOnError(error -> System.out.println("AI 서버 연결 에러: " + error.getMessage()))
+                .onErrorResume(error -> {
+                    System.out.println("AI 서버와 연결 중 문제가 발생했습니다.");
+                    return Flux.just(new TestWebFluxResponse("AI 서버와 연결 중 문제가 발생했습니다."));
+                });
     }
-
 }
