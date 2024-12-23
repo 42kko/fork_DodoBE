@@ -47,10 +47,10 @@ public class ExternalChatbotClient {
             return responseEntity.getBody();
         } catch (final HttpServerErrorException e) {
             // 상태 코드 500 (서버 오류) 처리
-            throw new RuntimeException(new NoExistRepoAnalyzeException("레포지토리 결과물을 아직 생성중입니다. 잠시만 기다려주세요."));
+            throw new NoExistRepoAnalyzeException("레포지토리 결과물을 아직 생성중입니다. 잠시만 기다려주세요.");
         } catch (final RestClientException e) {
             // 그 외 RestTemplate 관련 예외 처리
-            throw new RuntimeException(new NoExistGitRepoException("레포지토리 결과물을 아직 생성중입니다. 잠시만 기다려주세요."));
+            throw new NoExistGitRepoException("레포지토리 결과물을 아직 생성중입니다. 잠시만 기다려주세요.");
         }
     }
 }

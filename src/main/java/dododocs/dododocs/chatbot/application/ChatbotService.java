@@ -21,33 +21,10 @@ import java.util.List;
 @RequiredArgsConstructor
 @Service
 public class ChatbotService {
-    private final ExternalChatbotClientByWebFlux externalChatbotClientByWebFlux;
     private final ExternalChatbotClient externalChatbotClient;
+    private final ExternalChatbotClientByWebFlux externalChatbotClientByWebFlux;
     private final RepoAnalyzeRepository repoAnalyzeRepository;
     private final ChatLogRepository chatLogRepository;
-
-    public Mono<ExternalQuestToChatbotResponse> questionToChatbotAndSaveLogsByWebFlux(final long registeredRepoId, final String question) {
-        return Mono.justOrEmpty(repoAnalyzeRepository.findById(registeredRepoId))
-                .switchIfEmpty(Mono.error(new NoExistRepoAnalyzeException("레포지토리 정보가 존재하지 않습니다.")))
-                .flatMap(repoAnalyze -> Mono.fromCallable(() -> chatLogRepository.findTop3ByRepoAnalyzeOrderBySequenceDesc(repoAnalyze))
-                        .flatMapMany(Flux::fromIterable)
-                        .map(chatLog -> new ExternalQuestToChatbotRequest.RecentChatLog(chatLog.getQuestion(), chatLog.getAnswer()))
-                        .collectList()
-                        .flatMap(recentChatLogs -> {
-                            final ExternalQuestToChatbotRequest questToChatbotRequest = new ExternalQuestToChatbotRequest(
-                                    repoAnalyze.getRepoUrl() + "/" + repoAnalyze.getBranchName(),
-                                    question,
-                                    recentChatLogs
-                            );
-
-                            return externalChatbotClientByWebFlux.questToChatbot(questToChatbotRequest)
-                                    .doOnSuccess(response -> {
-                                        chatLogRepository.save(new ChatLog(question, response.getAnswer(), repoAnalyze));
-                                        System.out.println("Chatbot Response: " + response.getAnswer());
-                                    });
-                        })
-                );
-    }
 
     public ExternalQuestToChatbotResponse questionToChatbotAndSaveLogs(final long registeredRepoId, final String question) {
         final RepoAnalyze repoAnalyze = repoAnalyzeRepository.findById(registeredRepoId)
@@ -60,10 +37,13 @@ public class ChatbotService {
                 .toList();
 
         final ExternalQuestToChatbotRequest questToChatbotRequest = new ExternalQuestToChatbotRequest(
-                repoAnalyze.getRepoUrl() + "/" + repoAnalyze.getBranchName(),
+                repoAnalyze.getRepoUrl(),
                 question,
-                recentChatLogs
+                recentChatLogs,
+                false
         );
+
+        System.out.println("url:" + repoAnalyze.getRepoUrl() + "/" + repoAnalyze.getBranchName());
 
         final ExternalQuestToChatbotResponse externalQuestToChatbotResponse = externalChatbotClient.questToChatbot(questToChatbotRequest);
         chatLogRepository.save(new ChatLog(question, externalQuestToChatbotResponse.getAnswer(), repoAnalyze));

@@ -18,6 +18,8 @@ public class ExternalQuestToChatbotRequest {
     @JsonProperty("chat_history")
     private List<RecentChatLog> chatHistory;
 
+    private boolean stream;
+
     @Getter
     public static class RecentChatLog {
         private String question;
@@ -35,9 +37,11 @@ public class ExternalQuestToChatbotRequest {
     private ExternalQuestToChatbotRequest() {
     }
 
-    public ExternalQuestToChatbotRequest(final String repoUrl, final String query, final List<RecentChatLog> chatHistory) {
+    public ExternalQuestToChatbotRequest(final String repoUrl, final String query, final List<RecentChatLog> chatHistory,
+                                         final boolean stream) {
         this.repoUrl = repoUrl;
         this.query = query;
         this.chatHistory = chatHistory;
+        this.stream = stream;
     }
 }

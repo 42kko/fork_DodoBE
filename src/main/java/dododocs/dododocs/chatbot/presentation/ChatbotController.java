@@ -38,12 +38,10 @@ public class ChatbotController {
 
 
     @PostMapping("/question/save/{registeredRepoId}")
-    public Flux<ExternalQuestToChatbotResponse> questionToChatbotAndSaveLogs(@Authentication final Accessor accessor,
-                                                                             @PathVariable final Long registeredRepoId,
-                                                                             @RequestBody final QuestToChatbotRequest questToChatbotRequest) {
-        return chatbotService.questionToChatbotAndSaveLogsByWebFlux(registeredRepoId, questToChatbotRequest.getQuestion()).flux();
+    public ExternalQuestToChatbotResponse questionToChatbotAndSaveLogs(@PathVariable final Long registeredRepoId,
+                                                                       @RequestBody final QuestToChatbotRequest questToChatbotRequest) {
+        return chatbotService.questionToChatbotAndSaveLogs(registeredRepoId, questToChatbotRequest.getQuestion());
     }
-
 
     @GetMapping("/logs/{registeredRepoId}")
     public ResponseEntity<FindChatLogResponses> findChatbotHistory(@Authentication final Accessor accessor,
@@ -109,7 +107,8 @@ public class ChatbotController {
         final ExternalQuestToChatbotRequest externalQuestToChatbotRequest = new ExternalQuestToChatbotRequest(
                 repoAnalyze.getRepoUrl(),
                 questToChatbotRequest.getQuestion(),
-                recentChatLogs
+                recentChatLogs,
+                true
         );
 
         StringBuilder aggregatedText = new StringBuilder();

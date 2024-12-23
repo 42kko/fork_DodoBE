@@ -84,7 +84,7 @@ public class AnalyzeService {
                 uploadGitRepoContentToS3Request.isKorean(),
                 ownerName,
                 repoName,
-                branchName);
+                branchName, ownerName);
 
         // 개인 소유에서 찾지 못하면 조직 소유로 검색
         if (!success) {
@@ -95,7 +95,7 @@ public class AnalyzeService {
                         docsKey,
                         readmeKey,
                         uploadGitRepoContentToS3Request.isKorean(),
-                        orgName, repoName, branchName);
+                        orgName, repoName, branchName, ownerName);
                 if (success) {
                     // ownerName = orgName;
                     break;
@@ -137,9 +137,9 @@ public class AnalyzeService {
 
     // 특정 소유자(개인 또는 조직)에서 레포지토리를 찾아 업로드 시도
     private boolean tryUploadFromOwner(String repoUrl, boolean includeTest, String docsKey, String readmeKey, boolean korean,
-                                       String ownerName, String repoName, String branchName) {
+                                       String ownerName, String repoName, String branchName, String originMemberName) {
 
-        String s3Key = "source/" + ownerName + "-" + repoName + "-" + branchName;
+        String s3Key = "source/" + originMemberName + "-" + repoName + "-" + branchName;
         String downloadUrl = String.format("https://github.com/%s/%s/archive/refs/heads/%s.zip", ownerName, repoName, branchName);
         System.out.println("Attempting to download from GitHub URL: " + downloadUrl);
 
