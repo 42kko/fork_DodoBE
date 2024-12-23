@@ -156,6 +156,7 @@ public class AnalyzeService {
             return false;
         }
 
+
         // S3에 업로드
         try {
             ObjectMetadata metadata = new ObjectMetadata();
