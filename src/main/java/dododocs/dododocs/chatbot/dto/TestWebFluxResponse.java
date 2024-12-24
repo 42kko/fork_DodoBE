@@ -8,5 +8,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class TestWebFluxResponse {
-    private String answer;
+    private String content;
 }
