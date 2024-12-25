@@ -1,5 +1,6 @@
 package dododocs.dododocs.auth.infrastructure;
 
+import dododocs.dododocs.auth.dto.GithubOAuthMemberWithAccessToken;
 import dododocs.dododocs.auth.exception.InvalidOAuthException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
@@ -35,12 +36,7 @@ public class GithubOAuthClient {
         this.clientSecret = clientSecret;
     }
 
-    public GithubOAuthMember getOAuthMember(final String code) {
-        System.out.println("🔥 ======================================");
-        System.out.println("clientId:" + clientId);
-        System.out.println("clientSecret:" + clientSecret);
-        System.out.println("❤️ ======================================");
-
+    public GithubOAuthMemberWithAccessToken getOAuthMember(final String code) {
         final String accessToken = requestGithubAccessToken(code);
 
         final HttpHeaders httpHeaders = new HttpHeaders();
@@ -55,7 +51,8 @@ public class GithubOAuthClient {
         );
 
         if(githubOAuthMember.getStatusCode().is2xxSuccessful()) {
-            return githubOAuthMember.getBody();
+            GithubOAuthMember githubOAuthMemberBody = githubOAuthMember.getBody();
+            return new GithubOAuthMemberWithAccessToken(githubOAuthMemberBody, accessToken);
         }
 
         throw new InvalidOAuthException("깃허브 소셜 로그인 제공처 서버에 예기치 못한 문제가 발생했습니다.");

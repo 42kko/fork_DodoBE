@@ -2,7 +2,9 @@ package dododocs.dododocs.member.domain;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.Setter;
 
+@Setter
 @Getter
 @Table(name = "member")
 @Entity
@@ -21,8 +23,20 @@ public class Member {
     @Column(name = "origin_name")
     private String originName;
 
+    @Column(name = "access_token")
+    private String accessToken;
+
+
     protected Member() {
     }
+
+    public Member(final Long socialLoginId, final String nickname, final String originName, final String accessToken) {
+        this.socialLoginId = socialLoginId;
+        this.nickname = nickname;
+        this.originName = originName;
+        this.accessToken = accessToken;
+    }
+
 
     public Member(final Long socialLoginId, final String nickname, final String originName) {
         this.socialLoginId = socialLoginId;

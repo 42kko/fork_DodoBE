@@ -1,5 +1,6 @@
 package dododocs.dododocs.auth.application;
 
+import dododocs.dododocs.auth.dto.GithubOAuthMemberWithAccessToken;
 import dododocs.dododocs.auth.exception.NoExistMemberException;
 import dododocs.dododocs.auth.infrastructure.GithubOAuthClient;
 import dododocs.dododocs.auth.infrastructure.GithubOAuthMember;
@@ -28,26 +29,29 @@ public class AuthService {
 
     @Transactional
     public String generateTokenWithCode(final String code) throws Exception {
-        final GithubOAuthMember githubOAuthMember = githubOAuthClient.getOAuthMember(code);
+        final GithubOAuthMemberWithAccessToken githubOAuthMemberWithAccessToken = githubOAuthClient.getOAuthMember(code);
+        final GithubOAuthMember githubOAuthMember = githubOAuthMemberWithAccessToken.getGithubOAuthMember();
+        final String githubAccessToken = githubOAuthMemberWithAccessToken.getAccessToken();
 
-        final Member foundMember = findOrCreateMember(githubOAuthMember);
+        final Member foundMember = findOrCreateMember(githubOAuthMemberWithAccessToken.getGithubOAuthMember(), githubAccessToken);
+
         githubOrganizationClient.saveMemberOrganizationNames(foundMember, githubOAuthMember.getOriginName());
         final String accessToken = jwtTokenCreator.createToken(foundMember.getId());
         return accessToken;
     }
 
-    public Member findOrCreateMember(final GithubOAuthMember githubOAuthmember) {
+    public Member findOrCreateMember(final GithubOAuthMember githubOAuthmember, final String githubAccessToken) {
         final Long socialLoginId = githubOAuthmember.getSocialLoginId();
 
         if(!memberRepository.existsBySocialLoginId(socialLoginId)) {
-            memberRepository.save(generateMember(githubOAuthmember));
+            memberRepository.save(generateMember(githubOAuthmember, githubAccessToken));
         }
         final Member foundMember = memberRepository.findBySocialLoginId(socialLoginId);
         return foundMember;
     }
 
-    private Member generateMember(final GithubOAuthMember githubOAuthMember) {
-        return new Member(githubOAuthMember.getSocialLoginId(), githubOAuthMember.getNickName(), githubOAuthMember.getOriginName());
+    private Member generateMember(final GithubOAuthMember githubOAuthMember, final String githubAccessToken) {
+        return new Member(githubOAuthMember.getSocialLoginId(), githubOAuthMember.getNickName(), githubOAuthMember.getOriginName(), githubAccessToken);
     }
 
     public Long extractMemberId(final String accessToken) {
