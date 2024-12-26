@@ -12,6 +12,6 @@ import java.util.List;
 public interface ChatLogRepository extends JpaRepository<ChatLog, Long> {
     List<ChatLog> findTop3ByRepoAnalyzeOrderBySequenceDesc(final RepoAnalyze repoAnalyze);
 
-    @Query("SELECT c FROM ChatLog c WHERE c.repoAnalyze = :repoAnalyze ORDER BY c.sequence ASC")
+    @Query("SELECT c FROM ChatLog c WHERE c.repoAnalyze = :repoAnalyze ORDER BY c.sequence DESC ")
     Page<ChatLog> findByRepoAnalyzeOrderBySequenceWithPagination(@Param("repoAnalyze") final RepoAnalyze repoAnalyze, final Pageable pageable);
 }

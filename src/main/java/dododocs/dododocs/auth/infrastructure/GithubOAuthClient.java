@@ -39,6 +39,8 @@ public class GithubOAuthClient {
     public GithubOAuthMemberWithAccessToken getOAuthMember(final String code) {
         final String accessToken = requestGithubAccessToken(code);
 
+        System.out.println("🚀 accessToken: " + accessToken);
+
         final HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.add("Authorization", "token " + accessToken);
         final HttpEntity<MultiValueMap<String, String>> userInfoRequestEntity = new HttpEntity<>(httpHeaders);

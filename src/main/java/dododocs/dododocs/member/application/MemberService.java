@@ -19,6 +19,10 @@ import dododocs.dododocs.member.dto.FindRegisterMemberRepoResponses;
 import dododocs.dododocs.member.dto.FindRegisterRepoResponse;
 import dododocs.dododocs.member.dto.FindRepoNameListResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
@@ -48,8 +52,13 @@ public class MemberService {
         final String memberName = member.getOriginName();
         final String url = "https://api.github.com/users/" + memberName + "/repos";
 
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Bearer " + member.getAccessToken());
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+
         // GitHub API 호출하여 레포지토리 목록 가져오기
-        Object response = restTemplate.getForObject(url, Object.class);
+        ResponseEntity<Object> responseEntity = restTemplate.exchange(url, HttpMethod.GET, entity, Object.class);
+        Object response = responseEntity.getBody();
 
         List<Map<String, Object>> repos = objectMapper.convertValue(response, new TypeReference<List<Map<String, Object>>>() {});
 
@@ -59,7 +68,8 @@ public class MemberService {
         List<Map<String, Object>> organizationRepos = memberOrganizations.stream()
                 .flatMap(orgName -> {
                     String orgUrl = "https://api.github.com/orgs/" + orgName + "/repos";
-                    Object orgResponse = restTemplate.getForObject(orgUrl, Object.class);
+                    ResponseEntity<Object> orgResponseEntity = restTemplate.exchange(orgUrl, HttpMethod.GET, entity, Object.class);
+                    Object orgResponse = orgResponseEntity.getBody();
                     return objectMapper.convertValue(orgResponse, new TypeReference<List<Map<String, Object>>>() {}).stream();
                 })
                 .collect(Collectors.toList());

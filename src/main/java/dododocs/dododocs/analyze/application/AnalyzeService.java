@@ -53,8 +53,6 @@ public class AnalyzeService {
     // GitHub 레포지토리를 ZIP 파일로 가져와 S3에 업로드
     public void uploadGithubRepoToS3(final UploadGitRepoContentToS3Request uploadGitRepoContentToS3Request, final long memberId) {
 
-        System.out.println("=================12312312312312312321312");
-
         final String repoName = uploadGitRepoContentToS3Request.getRepositoryName();
         final String branchName = uploadGitRepoContentToS3Request.getBranchName();
 
@@ -77,6 +75,7 @@ public class AnalyzeService {
         String readmeKey = ownerName + "_" + repoName + "_" + branchName + "_README.md";
 
         boolean success = tryUploadFromOwner(
+                member.getAccessToken(),
                 String.format("https://github.com/%s/%s/%s", ownerName, repoName, branchName),
                 uploadGitRepoContentToS3Request.isIncludeTest(),
                 docsKey,
@@ -84,20 +83,21 @@ public class AnalyzeService {
                 uploadGitRepoContentToS3Request.isKorean(),
                 ownerName,
                 repoName,
-                branchName, ownerName);
+                branchName);
 
         // 개인 소유에서 찾지 못하면 조직 소유로 검색
         if (!success) {
             List<String> organizationNames = findOrganizationNames(member);
             for (String orgName : organizationNames) {
-                success = tryUploadFromOwner(String.format("https://github.com/%s/%s/%s", ownerName, repoName, branchName),
+                success = tryUploadFromOwner(
+                        member.getAccessToken(),
+                        String.format("https://github.com/%s/%s/%s", ownerName, repoName, branchName),
                         uploadGitRepoContentToS3Request.isIncludeTest(),
                         docsKey,
                         readmeKey,
                         uploadGitRepoContentToS3Request.isKorean(),
-                        orgName, repoName, branchName, ownerName);
+                        orgName, repoName, branchName);
                 if (success) {
-                    // ownerName = orgName;
                     break;
                 }
             }
@@ -109,55 +109,30 @@ public class AnalyzeService {
 
         String s3Key = ownerName + "-" + repoName;
         String repoUrl = String.format("https://github.com/%s/%s/%s", ownerName, repoName, branchName);
-        /* ExternalAiZipAnalyzeResponse externalAiZipAnalyzeResponse =
-                externalAiZipAnalyzeClient.requestAiZipDownloadAndAnalyze(new ExternalAiZipAnalyzeRequest
-                        (s3Key, String.format("https://github.com/%s/%s/%s", ownerName, repoName, branchName), List.of(), uploadGitRepoContentToS3Request.isIncludeTest(), uploadGitRepoContentToS3Request.isKorean()));
-         */
 
-        // 순서 : 깃허브 닉네임, 레포 이름, 브랜치명
-
-        // 1. readMeS3Key / 2. docsS3Key
-
-        // DB 에 레포 정보 저장할 엔티티 생성
-        // 1. readmeKey (AI 가 만들어준 s3 내의 레포 분석 결과인 ZIP 파일이 어디있는지)
-        // 2. docsS3key (AI 가 만들어준 s3 내의 레포 분석 결과인 ZIP 파일이 어디있는지)
-        // 3. repositoryName (ex. Gatsby-Starter-Haon)
-        // 4. ownerName (ex. msung99)
         repoAnalyzeRepository.save(
                 new RepoAnalyze(repoName,
                         branchName,
                         readmeKey,
                         docsKey,
-                        // "kakao-25_moheng_DOCS.zip",
-                        // "kakao-25_moheng_DOCS.zip",
                         repoUrl,
                         member)
         );
     }
 
-    // 특정 소유자(개인 또는 조직)에서 레포지토리를 찾아 업로드 시도
-    private boolean tryUploadFromOwner(String repoUrl, boolean includeTest, String docsKey, String readmeKey, boolean korean,
-                                       String ownerName, String repoName, String branchName, String originMemberName) {
+    private boolean tryUploadFromOwner(String accessToken, String repoUrl, boolean includeTest, String docsKey, String readmeKey, boolean korean,
+                                       String ownerName, String repoName, String branchName) {
 
-        String s3Key = "source/" + originMemberName + "-" + repoName + "-" + branchName;
-        String downloadUrl = String.format("https://github.com/%s/%s/archive/refs/heads/%s.zip", ownerName, repoName, branchName);
-        System.out.println("Attempting to download from GitHub URL: " + downloadUrl);
+        String downloadUrl = String.format("https://api.github.com/repos/%s/%s/zipball/%s", ownerName, repoName, branchName);
 
-        // ZIP 파일을 임시 디렉토리에 저장
         File tempFile = null;
         try {
             tempFile = File.createTempFile(repoName, ".zip");
-            downloadFileFromUrl(downloadUrl, tempFile);
+            downloadFileFromUrlWithAuth(downloadUrl, accessToken, tempFile);
         } catch (Exception e) {
-            System.out.println("깃허브 레포지토리 다운로드 받다가 오류터짐");
-            System.out.println("===================");
-            System.out.println(e.getMessage());
-            System.out.println("===================");
             return false;
         }
 
-
-        // S3에 업로드
         try {
             ObjectMetadata metadata = new ObjectMetadata();
             metadata.addUserMetadata("repo_url", repoUrl);
@@ -166,36 +141,21 @@ public class AnalyzeService {
             metadata.addUserMetadata("readme_key", readmeKey);
             metadata.addUserMetadata("korean", String.valueOf(korean));
 
-            amazonS3Client.putObject(new PutObjectRequest("haon-dododocs", s3Key, tempFile).withMetadata(metadata));
+            amazonS3Client.putObject(new PutObjectRequest("haon-dododocs", "source/" + ownerName + "-" + repoName + "-" + branchName, tempFile).withMetadata(metadata));
         } catch (Exception e) {
-            System.out.println("s3 에 업로드하다가 애러터짐");
-            System.out.println("===================");
-            System.out.println(e.getMessage());
-            System.out.println("===================");
-            System.out.println(e.getCause());
             return false;
         }
 
-        // 업로드 후 임시 파일 삭제
         tempFile.delete();
         return true;
     }
 
-    // URL에서 파일 다운로드
-    private void downloadFileFromUrl(String downloadUrl, File destinationFile) throws IOException {
-        URL url = new URL(downloadUrl);
+    private void downloadFileFromUrlWithAuth(String url, String accessToken, File destinationFile) throws IOException {
+        URLConnection connection = new URL(url).openConnection();
 
-        URLConnection connection;
-        String activeProfile = System.getProperty("spring.profiles.active", "default");
+        System.out.println("🌴 accessToken: " + accessToken);
 
-        // dev 또는 prod 프로파일에만 프록시 설정
-        if ("dev".equals(activeProfile)) {
-            Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("krmp-proxy.9rum.cc", 3128));
-            connection = url.openConnection(proxy);
-        } else {
-            connection = url.openConnection(); // 프록시 없이 직접 연결
-        }
-
+        connection.setRequestProperty("Authorization", "Bearer " + accessToken);
         try (InputStream inputStream = connection.getInputStream();
              OutputStream outputStream = new FileOutputStream(destinationFile)) {
 
@@ -207,8 +167,6 @@ public class AnalyzeService {
         }
     }
 
-
-    // 특정 멤버의 조직 이름 리스트 반환
     private List<String> findOrganizationNames(final Member member) {
         return memberOrganizationRepository.findOrganizationNamesByMember(member);
     }

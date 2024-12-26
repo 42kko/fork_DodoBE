@@ -94,7 +94,7 @@ public class ChatbotController {
                 .onErrorResume(error -> Flux.just(new TestWebFluxResponse("AI 서버와 연결 중 문제가 발생했습니다.")));
     }
 
-    @PostMapping(value = "/stream-and-save/{registeredRepoId}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    /* @PostMapping(value = "/stream-and-save/{registeredRepoId}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<String> streamAndSaveChatLogs(@PathVariable final Long registeredRepoId,
                                               @RequestBody final QuestToChatbotRequest questToChatbotRequest) {
         final RepoAnalyze repoAnalyze = repoAnalyzeRepository.findById(registeredRepoId)
@@ -147,5 +147,61 @@ public class ChatbotController {
                     System.out.println("AI 서버와 연결 중 문제가 발생했습니다.");
                     return Flux.just("AI 서버와 연결 중 문제가 발생했습니다.");
                 });
+    } */
+
+    @PostMapping(value = "/stream-and-save/{registeredRepoId}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public Flux<ExternalQuestToChatbotResponse> streamAndSaveChatLogs(@PathVariable final Long registeredRepoId,
+                                                                      @RequestBody final QuestToChatbotRequest questToChatbotRequest) {
+        final RepoAnalyze repoAnalyze = repoAnalyzeRepository.findById(registeredRepoId)
+                .orElseThrow(() -> new NoExistRepoAnalyzeException("레포지토리 정보가 존재하지 않습니다."));
+
+        final List<ChatLog> chatLogs = chatLogRepository.findTop3ByRepoAnalyzeOrderBySequenceDesc(repoAnalyze);
+        final List<ExternalQuestToChatbotRequest.RecentChatLog> recentChatLogs = chatLogs.stream()
+                .map(chatLog -> new ExternalQuestToChatbotRequest.RecentChatLog(chatLog.getQuestion(), chatLog.getAnswer()))
+                .toList();
+
+        System.out.println("레포 URL: " + repoAnalyze.getRepoUrl());
+
+        final ExternalQuestToChatbotRequest externalQuestToChatbotRequest = new ExternalQuestToChatbotRequest(
+                repoAnalyze.getRepoUrl(),
+                questToChatbotRequest.getQuestion(),
+                recentChatLogs,
+                true
+        );
+
+        StringBuilder aggregatedText = new StringBuilder();
+
+        return webClient.post()
+                .uri("/chat")
+                .bodyValue(externalQuestToChatbotRequest)
+                .retrieve()
+                .bodyToFlux(String.class)
+                .map(data -> {
+                    System.out.println("AI 서버에서 수신한 데이터: " + data);
+
+                    // JSON 데이터에서 "answer" 키의 값을 추출
+                    String extractedAnswer;
+                    try {
+                        JsonNode jsonNode = new ObjectMapper().readTree(data);
+                        extractedAnswer = jsonNode.get("answer").asText();
+                    } catch (JsonProcessingException e) {
+                        System.out.println("JSON 파싱 오류: " + e.getMessage());
+                        throw new RuntimeException("응답 데이터 파싱 중 오류 발생", e);
+                    }
+
+                    aggregatedText.append(extractedAnswer).append(" ");
+                    return new ExternalQuestToChatbotResponse(extractedAnswer); // DTO로 변환
+                })
+                .doOnComplete(() -> {
+                    String aggregatedResult = aggregatedText.toString().trim();
+                    chatLogRepository.save(new ChatLog(questToChatbotRequest.getQuestion(), aggregatedResult, repoAnalyze));
+                    System.out.println("전체 텍스트 저장 완료: " + aggregatedResult);
+                })
+                .doOnError(error -> System.out.println("AI 서버 연결 에러: " + error.getMessage()))
+                .onErrorResume(error -> {
+                    System.out.println("AI 서버와 연결 중 문제가 발생했습니다.");
+                    return Flux.just(new ExternalQuestToChatbotResponse("AI 서버와 연결 중 문제가 발생했습니다."));
+                });
     }
+
 }
